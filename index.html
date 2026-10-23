@@ -1,0 +1,1271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ashwin CK — Game &amp; Interactive Developer</title>
+  <meta name="description" content="Portfolio of Ashwin CK, a creative game and application developer specializing in Unity, interactive projection mapping, LiDAR, IoT and laser shows.">
+  <meta name="theme-color" content="#07070b">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2307070b'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='%238b5cf6' font-family='sans-serif' font-weight='700'%3EA%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <script>try { var t = localStorage.getItem("theme"); if (t) { document.documentElement.dataset.theme = t; if (/^(arcade|gameboy|sunset)$/.test(t)) document.documentElement.dataset.style = "pixel"; } } catch (e) {}</script>
+  <style>
+:root {
+  /* Theme tokens — overridden per theme at the bottom of this file */
+  --bg: #07070b;
+  --bg-rgb: 7, 7, 11;
+  --fg-rgb: 255, 255, 255;
+  --surface: #0f0f17;
+  --surface-2: #151521;
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #ececf3;
+  --text-soft: #c4c4d2;
+  --muted: #8b8ba0;
+  --accent: #8b5cf6;
+  --accent-rgb: 139, 92, 246;
+  --accent2: #22d3ee;
+  --accent2-rgb: 34, 211, 238;
+  --on-accent: #07070b;
+  --grain-opacity: .06;
+  --grad: linear-gradient(120deg, var(--accent), var(--accent2));
+  --radius: 18px;
+  --gutter: clamp(20px, 5vw, 64px);
+  --max: 1160px;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-head: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; margin: 0; padding: 0; }
+h1, h2, h3, p { margin: 0; }
+:focus-visible { outline: 2px solid var(--accent2); outline-offset: 3px; border-radius: 6px; }
+::selection { background: var(--accent); color: #fff; }
+
+#bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -2; }
+.grain {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.grad { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.muted { color: var(--muted); }
+.mono { font-family: var(--font-mono); }
+.small { font-size: .8rem; }
+
+/* NAV */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px var(--gutter);
+  transition: background .3s, backdrop-filter .3s, border-color .3s, padding .3s;
+  border-bottom: 1px solid transparent;
+}
+.nav.scrolled {
+  background: rgba(var(--bg-rgb), .7); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-color: var(--border); padding-block: 12px;
+}
+.logo { font-family: var(--font-head); font-weight: 700; font-size: 1.3rem; letter-spacing: -.02em; }
+.logo span { color: var(--accent2); }
+.nav nav { display: flex; align-items: center; gap: clamp(14px, 3vw, 32px); font-size: .92rem; color: var(--muted); }
+.nav nav a:hover { color: var(--text); }
+.nav-cta { color: var(--text) !important; padding: 8px 16px; border: 1px solid var(--border); border-radius: 999px; transition: border-color .2s, background .2s; }
+.nav-cta:hover { border-color: var(--accent); background: rgba(var(--accent-rgb), .12); }
+
+/* LAYOUT */
+.section { max-width: var(--max); margin: 0 auto; padding: clamp(80px, 12vw, 140px) var(--gutter); }
+.section-head { margin-bottom: clamp(36px, 6vw, 64px); }
+.kicker { font-family: var(--font-mono); font-size: .8rem; color: var(--accent2); letter-spacing: .08em; text-transform: uppercase; }
+h2 { font-family: var(--font-head); font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.1; letter-spacing: -.03em; margin-top: 12px; }
+h2.big { font-size: clamp(2.4rem, 7vw, 5rem); margin-bottom: 24px; }
+h3 { font-family: var(--font-head); font-size: 1.25rem; letter-spacing: -.01em; }
+
+/* HERO */
+.hero {
+  min-height: 100svh; max-width: var(--max); margin: 0 auto;
+  padding: 140px var(--gutter) 80px;
+  display: flex; flex-direction: column; justify-content: center; position: relative;
+}
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 10px; align-self: flex-start;
+  font-family: var(--font-mono); font-size: .8rem; color: var(--muted);
+  padding: 7px 14px; border: 1px solid var(--border); border-radius: 999px; background: rgba(var(--fg-rgb), .03);
+  margin-bottom: 28px;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 0 rgba(52, 211, 153, .6); animation: ping 2s infinite; }
+@keyframes ping { 70% { box-shadow: 0 0 0 10px rgba(52, 211, 153, 0); } 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); } }
+.hero-title { font-family: var(--font-head); font-size: clamp(2.6rem, 8.5vw, 6.4rem); line-height: 1.04; letter-spacing: -.04em; font-weight: 700; }
+.typed { color: var(--text); }
+.caret { color: var(--accent2); animation: blink 1s steps(1) infinite; margin-left: 2px; font-weight: 400; }
+@keyframes blink { 50% { opacity: 0; } }
+.hero-sub { max-width: 620px; margin-top: 28px; font-size: clamp(1.02rem, 1.6vw, 1.2rem); color: var(--muted); }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
+.hero-stats { display: flex; flex-wrap: wrap; gap: clamp(24px, 6vw, 64px); margin-top: clamp(48px, 8vw, 88px); }
+.hero-stats strong { display: block; font-family: var(--font-head); font-size: clamp(2rem, 4vw, 2.8rem); line-height: 1; }
+.hero-stats strong::after { content: "+"; color: var(--accent2); }
+.hero-stats span { font-size: .85rem; color: var(--muted); }
+.scroll-hint { position: absolute; bottom: 28px; left: var(--gutter); width: 24px; height: 40px; border: 1.5px solid var(--border); border-radius: 14px; display: none; }
+.scroll-hint span { position: absolute; left: 50%; top: 8px; width: 3px; height: 8px; margin-left: -1.5px; background: var(--accent2); border-radius: 2px; animation: scroll 1.8s infinite; }
+@keyframes scroll { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(14px); } }
+@media (min-width: 900px) { .scroll-hint { display: block; } }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px; padding: 14px 26px; border-radius: 999px;
+  font-weight: 500; font-size: .95rem; border: 1px solid transparent; cursor: pointer;
+  transition: transform .2s, box-shadow .2s, background .2s, border-color .2s;
+}
+.btn-primary { background: var(--grad); color: var(--on-accent); font-weight: 600; box-shadow: 0 8px 30px -8px rgba(var(--accent-rgb), .6); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 40px -8px rgba(var(--accent2-rgb), .55); }
+.btn-ghost { border-color: var(--border); background: rgba(var(--fg-rgb), .03); }
+.btn-ghost:hover { border-color: var(--accent); background: rgba(var(--accent-rgb), .12); }
+.btn-lg { padding: 18px 34px; font-size: clamp(.95rem, 2.4vw, 1.15rem); }
+
+/* ABOUT */
+.about-grid { display: grid; gap: 32px; grid-template-columns: 1.4fr 1fr; align-items: start; }
+.about-text { display: grid; gap: 18px; font-size: 1.08rem; color: var(--text-soft); }
+.about-card { padding: 28px; }
+.now { margin-top: 16px; display: grid; gap: 14px; font-size: .95rem; }
+.now .k { font-family: var(--font-mono); color: var(--accent2); font-size: .8rem; margin-right: 6px; }
+@media (max-width: 800px) { .about-grid { grid-template-columns: 1fr; } }
+
+.marquee { margin-top: 72px; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
+.marquee-track { display: flex; gap: 14px; width: max-content; animation: marquee 35s linear infinite; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+.marquee span { padding: 10px 20px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); font-family: var(--font-mono); font-size: .85rem; color: var(--muted); white-space: nowrap; }
+@keyframes marquee { to { transform: translateX(calc(-50% - 7px)); } }
+
+/* SPOTLIGHT SURFACE */
+.spot {
+  position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+  transition: transform .35s, border-color .35s;
+}
+.spot::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .3s;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(var(--accent-rgb), .16), transparent 60%);
+}
+.spot:hover::before { opacity: 1; }
+.spot:hover { border-color: rgba(var(--accent-rgb), .45); }
+
+/* PROJECTS */
+.projects { display: grid; gap: 24px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
+.card { display: flex; flex-direction: column; }
+.card:hover { transform: translateY(-6px); }
+.card-art { height: 170px; position: relative; }
+.card-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, var(--surface)); }
+.a1 { background: radial-gradient(circle at 20% 30%, #8b5cf6, transparent 55%), radial-gradient(circle at 80% 70%, #22d3ee, transparent 55%), var(--surface-2); }
+.a2 { background: radial-gradient(circle at 75% 25%, #f472b6, transparent 55%), radial-gradient(circle at 20% 80%, #8b5cf6, transparent 55%), var(--surface-2); }
+.a3 { background: radial-gradient(circle at 30% 70%, #34d399, transparent 55%), radial-gradient(circle at 80% 20%, #22d3ee, transparent 55%), var(--surface-2); }
+.a4 { background: radial-gradient(circle at 50% 20%, #fbbf24, transparent 55%), radial-gradient(circle at 20% 80%, #f43f5e, transparent 55%), var(--surface-2); }
+.a5 { background: radial-gradient(circle at 80% 80%, #6366f1, transparent 55%), radial-gradient(circle at 15% 25%, #14b8a6, transparent 55%), var(--surface-2); }
+.a6 { background: radial-gradient(circle at 25% 25%, #38bdf8, transparent 55%), radial-gradient(circle at 75% 80%, #a78bfa, transparent 55%), var(--surface-2); }
+.a7 { background: radial-gradient(circle at 70% 30%, #f43f5e, transparent 55%), radial-gradient(circle at 25% 75%, #22d3ee, transparent 55%), var(--surface-2); }
+.a8 { background: radial-gradient(circle at 25% 30%, #34d399, transparent 55%), radial-gradient(circle at 80% 75%, #fbbf24, transparent 55%), var(--surface-2); }
+.subhead { font-size: 1.05rem; color: var(--muted); font-weight: 500; margin: 56px 0 18px; font-family: var(--font-mono); letter-spacing: .02em; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.chips li { padding: 9px 16px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); font-size: .9rem; color: var(--text-soft); transition: border-color .2s, color .2s; }
+.chips li:hover { border-color: var(--accent); color: var(--text); }
+.loc { margin-top: 36px; font-size: .9rem; }
+.marquee { margin-top: 0; }
+.card-body { padding: 4px 24px 24px; display: flex; flex-direction: column; gap: 12px; flex: 1; position: relative; }
+.card-body p { color: var(--muted); font-size: .95rem; }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 6px; }
+.tags li { font-family: var(--font-mono); font-size: .72rem; padding: 4px 10px; border-radius: 6px; background: rgba(var(--fg-rgb), .05); color: var(--text-soft); }
+.card-links { display: flex; gap: 18px; font-size: .88rem; font-weight: 500; }
+.card-links a { color: var(--accent2); transition: opacity .2s; }
+.card-links a:hover { opacity: .7; }
+
+/* TIMELINE */
+.timeline { position: relative; display: grid; gap: 40px; padding-left: 28px; }
+.timeline::before { content: ""; position: absolute; left: 5px; top: 8px; bottom: 8px; width: 1px; background: linear-gradient(var(--accent), var(--accent2), transparent); }
+.timeline li { position: relative; display: grid; grid-template-columns: 170px 1fr; gap: 24px; }
+.timeline li::before { content: ""; position: absolute; left: -28px; top: 8px; width: 11px; height: 11px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent2); }
+.when { font-size: .82rem; color: var(--muted); padding-top: 4px; }
+.timeline h3 { font-size: 1.15rem; }
+.timeline p { margin-top: 8px; color: var(--muted); max-width: 600px; }
+@media (max-width: 640px) { .timeline li { grid-template-columns: 1fr; gap: 6px; } }
+
+/* CONTACT */
+.contact { text-align: center; }
+.contact .hero-sub { margin: 0 auto 36px; }
+.socials { display: flex; justify-content: center; flex-wrap: wrap; gap: 28px; margin-top: 44px; color: var(--muted); }
+.socials a { border-bottom: 1px solid transparent; transition: color .2s, border-color .2s; }
+.socials a:hover { color: var(--text); border-color: var(--accent2); }
+
+.footer {
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  max-width: var(--max); margin: 0 auto; padding: 28px var(--gutter);
+  border-top: 1px solid var(--border); color: var(--muted); font-size: .85rem;
+}
+.footer a:hover { color: var(--text); }
+
+/* REVEAL ON SCROLL */
+.js .reveal { opacity: 0; transform: translateY(28px); transition: opacity .8s cubic-bezier(.2, .7, .2, 1), transform .8s cubic-bezier(.2, .7, .2, 1); transition-delay: var(--d, 0s); }
+.js .reveal.in { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .marquee-track { animation: none; }
+  .js .reveal { opacity: 1; transform: none; }
+}
+@media (max-width: 560px) {
+  .nav nav a:not(.nav-cta) { display: none; }
+}
+
+
+/* ============ THEMES ============ */
+:root[data-theme="ember"]   { --accent: #ff7a1a; --accent-rgb: 255, 122, 26; --accent2: #ff3d81; --accent2-rgb: 255, 61, 129; --bg: #0b0706; --bg-rgb: 11, 7, 6; --surface: #15100e; --surface-2: #1d1512; }
+:root[data-theme="emerald"] { --accent: #10d98c; --accent-rgb: 16, 217, 140; --accent2: #2dd4ff; --accent2-rgb: 45, 212, 255; --bg: #05090a; --bg-rgb: 5, 9, 10; --surface: #0c1313; --surface-2: #121c1c; }
+:root[data-theme="neon"]    { --accent: #ff2bd6; --accent-rgb: 255, 43, 214; --accent2: #7c3aff; --accent2-rgb: 124, 58, 255; --bg: #08050d; --bg-rgb: 8, 5, 13; --surface: #120c1c; --surface-2: #1a1228; }
+:root[data-theme="ocean"]   { --accent: #3b82f6; --accent-rgb: 59, 130, 246; --accent2: #5eead4; --accent2-rgb: 94, 234, 212; --bg: #050810; --bg-rgb: 5, 8, 16; --surface: #0b111f; --surface-2: #111a2e; }
+:root[data-theme="gold"]    { --accent: #f5c04a; --accent-rgb: 245, 192, 74; --accent2: #ff8a3d; --accent2-rgb: 255, 138, 61; --bg: #0a0805; --bg-rgb: 10, 8, 5; --surface: #14110a; --surface-2: #1c170e; }
+:root[data-theme="mono"]    { --accent: #ffffff; --accent-rgb: 255, 255, 255; --accent2: #9a9aae; --accent2-rgb: 154, 154, 174; --bg: #000000; --bg-rgb: 0, 0, 0; --surface: #0c0c0c; --surface-2: #141414; --border: rgba(255, 255, 255, .12); }
+:root[data-theme="paper"] {
+  --bg: #f6f4ee; --bg-rgb: 246, 244, 238; --fg-rgb: 20, 20, 30;
+  --surface: #ffffff; --surface-2: #ebe8df; --border: rgba(20, 20, 30, .1);
+  --text: #15151f; --text-soft: #3a3a4a; --muted: #6b6b7a;
+  --accent: #5b3df5; --accent-rgb: 91, 61, 245; --accent2: #0e9bb5; --accent2-rgb: 14, 155, 181;
+  --on-accent: #ffffff; --grain-opacity: .035;
+}
+:root[data-theme="paper"] .btn-primary { box-shadow: 0 8px 30px -10px rgba(var(--accent-rgb), .5); }
+:root[data-theme="paper"] .dot { background: #10b981; }
+
+/* THEME SWITCHER */
+.themer { position: fixed; right: 18px; bottom: 18px; z-index: 60; }
+.themer-btn {
+  display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, .6); transition: transform .2s, border-color .2s;
+}
+.themer-btn:hover { transform: scale(1.08); border-color: var(--accent); }
+.themer-btn svg { width: 20px; height: 20px; }
+.themer-panel {
+  position: absolute; right: 0; bottom: 58px; width: 230px; padding: 14px;
+  background: rgba(var(--bg-rgb), .92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 20px 50px -15px rgba(0, 0, 0, .7);
+  opacity: 0; transform: translateY(8px) scale(.98); pointer-events: none; transition: opacity .2s, transform .2s;
+}
+.themer.open .themer-panel { opacity: 1; transform: none; pointer-events: auto; }
+.themer-title { font-family: var(--font-mono); font-size: .72rem; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px; }
+.swatches { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.swatch {
+  display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 10px; cursor: pointer;
+  background: rgba(var(--fg-rgb), .04); border: 1px solid transparent; color: var(--text); font: inherit; font-size: .8rem; text-align: left;
+}
+.swatch:hover { border-color: var(--border); }
+.swatch[aria-pressed="true"] { border-color: var(--accent); background: rgba(var(--accent-rgb), .1); }
+.swatch i { width: 20px; height: 20px; border-radius: 50%; flex: none; border: 1px solid rgba(128, 128, 128, .35); }
+
+/* ============ INTERACTIVE LAYER ============ */
+.progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 80; background: var(--grad); transform: scaleX(0); transform-origin: 0 50%; }
+.lead { margin-top: 14px; max-width: 620px; color: var(--muted); font-size: 1.05rem; }
+
+/* nav scroll-spy */
+.nav nav a[aria-current="true"]:not(.nav-cta) { color: var(--text); }
+.nav nav a[aria-current="true"]:not(.nav-cta)::after { content: ""; display: block; height: 2px; margin-top: 2px; border-radius: 2px; background: var(--grad); }
+
+/* custom cursor (fine pointers only) */
+.cursor-dot, .cursor-ring { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 120; border-radius: 50%; will-change: transform; }
+.cursor-dot { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: var(--accent2); }
+.cursor-ring { width: 38px; height: 38px; margin: -19px 0 0 -19px; border: 1.5px solid rgba(var(--accent-rgb), .55); transition: width .25s, height .25s, margin .25s, background .25s, border-color .25s; }
+.cursor-ring.active { width: 64px; height: 64px; margin: -32px 0 0 -32px; background: rgba(var(--accent-rgb), .1); border-color: var(--accent); }
+.cursor-ring.down { width: 26px; height: 26px; margin: -13px 0 0 -13px; }
+
+.touch-hint { position: absolute; left: var(--gutter); bottom: 28px; display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: .78rem; color: var(--muted); }
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent2); animation: ping2 2s infinite; }
+@keyframes ping2 { 0% { box-shadow: 0 0 0 0 rgba(var(--accent2-rgb), .6); } 70%, 100% { box-shadow: 0 0 0 12px rgba(var(--accent2-rgb), 0); } }
+
+/* project filters + card motion */
+.filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 32px; }
+.filter { font: inherit; font-size: .88rem; padding: 9px 18px; border-radius: 999px; cursor: pointer; color: var(--muted); background: transparent; border: 1px solid var(--border); transition: color .2s, border-color .2s, background .2s; }
+.filter:hover { color: var(--text); border-color: rgba(var(--accent-rgb), .6); }
+.filter[aria-pressed="true"] { color: var(--on-accent); background: var(--grad); border-color: transparent; font-weight: 600; }
+.card[hidden] { display: none; }
+.card.pop { animation: pop .5s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes pop { from { opacity: 0; transform: scale(.94) translateY(14px); } to { opacity: 1; transform: none; } }
+.js .reveal.done { transition: transform .35s cubic-bezier(.2, .7, .2, 1), opacity .3s, border-color .35s; transition-delay: 0s; }
+.js .reveal.done.tilting { transition: transform .12s ease-out, border-color .35s; }
+.card { transform-style: preserve-3d; will-change: transform; }
+
+/* playground */
+.panel { margin-top: 28px; padding: clamp(16px, 3vw, 28px); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.panel-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.panel-head h3 { margin-bottom: 4px; }
+.stage { display: block; width: 100%; border-radius: 12px; background: #05050a; border: 1px solid rgba(255, 255, 255, .06); }
+.stage-laser { aspect-ratio: 16 / 7; min-height: 260px; cursor: crosshair; }
+.stage-game { aspect-ratio: 16 / 8; min-height: 280px; cursor: crosshair; touch-action: manipulation; }
+.controls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 22px 32px; margin-top: 20px; }
+.ctl { display: grid; gap: 8px; min-width: 150px; }
+.ctl-label { font-family: var(--font-mono); font-size: .74rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.ctl-label output { color: var(--accent2); margin-left: 6px; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.seg button, .toggle { font: inherit; font-size: .85rem; padding: 8px 14px; border-radius: 10px; cursor: pointer; color: var(--muted); background: rgba(var(--fg-rgb), .04); border: 1px solid var(--border); transition: color .2s, border-color .2s, background .2s; }
+.seg button:hover, .toggle:hover { color: var(--text); }
+.seg button[aria-pressed="true"], .toggle[aria-pressed="true"] { color: var(--text); border-color: var(--accent); background: rgba(var(--accent-rgb), .14); }
+input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+
+.hud { display: flex; gap: 10px; flex-wrap: wrap; font-family: var(--font-mono); font-size: .8rem; color: var(--muted); }
+.hud li { padding: 7px 12px; border: 1px solid var(--border); border-radius: 10px; background: rgba(var(--fg-rgb), .03); }
+.hud b { color: var(--text); margin-left: 6px; font-weight: 500; }
+.game-wrap { position: relative; }
+.game-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 20px; border-radius: 12px; background: rgba(5, 5, 10, .72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: #ececf3; transition: opacity .25s; }
+.game-overlay h4 { margin: 0; font-family: var(--font-head); font-size: clamp(1.6rem, 4vw, 2.4rem); letter-spacing: -.02em; }
+.game-overlay p { margin: 0 0 8px; max-width: 420px; color: #9a9aae; }
+.game-overlay.off { opacity: 0; pointer-events: none; }
+
+.contact-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+.toast { position: fixed; left: 50%; bottom: 28px; z-index: 90; transform: translate(-50%, 20px); padding: 12px 20px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--accent); color: var(--text); font-size: .9rem; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 640px) {
+  .stage-laser { aspect-ratio: 4 / 3; }
+  .stage-game { aspect-ratio: 4 / 3; }
+  .touch-hint { font-size: .7rem; bottom: 18px; }
+  .nav nav a:not(.nav-cta) { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .cursor-ring { transition: none; } .progress { transition: none; } }
+
+/* ============ PIXEL THEMES ============ */
+:root[data-theme="arcade"] {
+  --bg: #0d0221; --bg-rgb: 13, 2, 33; --surface: #1a0b3b; --surface-2: #2a1259;
+  --border: rgba(255, 255, 255, .22); --text: #f3ecff; --text-soft: #d3c5f5; --muted: #a495cf;
+  --accent: #00ff9c; --accent-rgb: 0, 255, 156; --accent2: #ff3cac; --accent2-rgb: 255, 60, 172; --on-accent: #0d0221;
+}
+:root[data-theme="gameboy"] {
+  --bg: #0f380f; --bg-rgb: 15, 56, 15; --surface: #1a4a1a; --surface-2: #306230;
+  --border: rgba(155, 188, 15, .4); --text: #cfe86a; --text-soft: #b5d13f; --muted: #8bac0f;
+  --accent: #9bbc0f; --accent-rgb: 155, 188, 15; --accent2: #e0f8a0; --accent2-rgb: 224, 248, 160; --on-accent: #0f380f;
+}
+:root[data-theme="sunset"] {
+  --bg: #1b1033; --bg-rgb: 27, 16, 51; --surface: #2a1650; --surface-2: #3a1d6b;
+  --border: rgba(255, 255, 255, .22); --text: #fff3e0; --text-soft: #f1d9c0; --muted: #c9a6e8;
+  --accent: #ff9e3d; --accent-rgb: 255, 158, 61; --accent2: #ff4d8d; --accent2-rgb: 255, 77, 141; --on-accent: #1b1033;
+}
+
+:root[data-style="pixel"] {
+  --font-head: "Press Start 2P", "VT323", monospace;
+  --font-body: "VT323", ui-monospace, monospace;
+  --font-mono: "VT323", ui-monospace, monospace;
+  --grad: linear-gradient(var(--accent), var(--accent));
+  --grain-opacity: .5;
+  --hard: 5px 5px 0 rgba(0, 0, 0, .6);
+  font-size: 125%;
+}
+:root[data-style="pixel"] * { border-radius: 0 !important; }
+:root[data-style="pixel"] body { line-height: 1.35; -webkit-font-smoothing: none; font-smooth: never; }
+:root[data-style="pixel"] .grain {
+  background-image: repeating-linear-gradient(0deg, rgba(0, 0, 0, .35) 0 1px, transparent 1px 3px);
+}
+:root[data-style="pixel"] .stage { image-rendering: pixelated; image-rendering: crisp-edges; }
+
+/* type */
+:root[data-style="pixel"] .hero-title { font-size: clamp(1.05rem, 3.4vw, 2.3rem); line-height: 1.55; letter-spacing: 0; text-shadow: 3px 3px 0 rgba(0, 0, 0, .55); }
+:root[data-style="pixel"] .grad { background: none; -webkit-text-fill-color: currentColor; color: var(--accent); }
+:root[data-style="pixel"] h2 { font-size: clamp(.95rem, 2.7vw, 1.6rem); line-height: 1.5; letter-spacing: 0; }
+:root[data-style="pixel"] h2.big { font-size: clamp(1.1rem, 4.4vw, 2.6rem); }
+:root[data-style="pixel"] h3 { font-size: .72rem; line-height: 1.6; letter-spacing: 0; }
+:root[data-style="pixel"] .logo { font-size: .8rem; letter-spacing: 0; }
+:root[data-style="pixel"] .hero-stats strong { font-size: 1.3rem; }
+:root[data-style="pixel"] .kicker { letter-spacing: .04em; font-size: 1.1rem; }
+:root[data-style="pixel"] .hero-sub, :root[data-style="pixel"] .lead { font-size: 1.3rem; }
+:root[data-style="pixel"] .about-text { font-size: 1.3rem; }
+:root[data-style="pixel"] .caret { display: inline-block; width: .5em; height: .9em; margin-left: 6px; background: var(--accent2); color: transparent; overflow: hidden; vertical-align: -.1em; }
+
+/* surfaces: thick borders + hard shadows */
+:root[data-style="pixel"] :is(.card, .panel, .about-card, .btn, .chips li, .filter, .seg button, .toggle, .hud li, .eyebrow, .marquee span, .themer-btn, .themer-panel, .swatch, .stage, .nav-cta, .toast) { border-width: 2px; }
+:root[data-style="pixel"] :is(.card, .panel, .about-card) { box-shadow: var(--hard); }
+:root[data-style="pixel"] .spot::before { display: none; }
+:root[data-style="pixel"] .spot:hover { border-color: var(--accent); }
+:root[data-style="pixel"] .card:hover { transform: translate(-3px, -3px); box-shadow: 8px 8px 0 rgba(var(--accent-rgb), .55); }
+:root[data-style="pixel"] .nav.scrolled { background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; border-bottom-width: 2px; }
+:root[data-style="pixel"] .themer-panel { background: var(--bg); backdrop-filter: none; box-shadow: var(--hard); max-height: 70vh; overflow: auto; }
+:root[data-style="pixel"] .game-overlay { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(var(--bg-rgb), .85); }
+:root[data-style="pixel"] .game-overlay h4 { font-size: clamp(1rem, 3vw, 1.6rem); line-height: 1.5; }
+
+/* buttons */
+:root[data-style="pixel"] .btn { border: 3px solid var(--on-accent); box-shadow: 4px 4px 0 rgba(0, 0, 0, .65); font-size: 1.15rem; transition: transform .08s steps(2), box-shadow .08s steps(2); }
+:root[data-style="pixel"] .btn-primary { background: var(--accent); color: var(--on-accent); }
+:root[data-style="pixel"] .btn-ghost { background: var(--surface); color: var(--text); border-color: var(--accent); }
+:root[data-style="pixel"] .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 rgba(0, 0, 0, .65); }
+:root[data-style="pixel"] .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 rgba(0, 0, 0, .65); }
+:root[data-style="pixel"] .filter { font-size: 1.1rem; }
+:root[data-style="pixel"] .filter[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+:root[data-style="pixel"] .swatch.px i { border-radius: 0; }
+:root[data-style="pixel"] .swatch[aria-pressed="true"] { border-color: var(--accent); }
+:root[data-style="pixel"] .progress { height: 6px; background: var(--accent); }
+:root[data-style="pixel"] .cursor-ring { border-width: 3px; }
+
+/* chunky motion */
+:root[data-style="pixel"].js .reveal { transition-timing-function: steps(6); }
+:root[data-style="pixel"] .marquee-track { animation-timing-function: steps(60); }
+:root[data-style="pixel"] .timeline::before { width: 3px; background: var(--accent); }
+:root[data-style="pixel"] .timeline li::before { width: 13px; height: 13px; border-width: 3px; }
+
+/* dithered card art */
+:root[data-style="pixel"] .card-art::after { display: none; }
+:root[data-style="pixel"] .card-art { height: 150px; border-bottom: 2px solid var(--border); }
+:root[data-style="pixel"] :is(.a1, .a3, .a5, .a7) { background: repeating-conic-gradient(var(--accent) 0 25%, var(--surface-2) 0 50%) 0 0 / 24px 24px; }
+:root[data-style="pixel"] :is(.a2, .a4, .a6, .a8) { background: repeating-conic-gradient(var(--accent2) 0 25%, var(--surface-2) 0 50%) 0 0 / 16px 16px; }
+:root[data-style="pixel"] :is(.a3, .a4) { background-size: 12px 12px; }
+:root[data-style="pixel"] :is(.a7, .a8) { background-size: 32px 32px; }
+
+</style>
+</head>
+<body>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="nav" id="nav">
+    <a href="#top" class="logo">ashwin<span>.</span></a>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#work">What I build</a>
+      <a href="#play">Play</a>
+      <a href="#experience">Experience</a>
+      <a href="#contact" class="nav-cta">Let's talk</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <p class="eyebrow reveal"><span class="dot"></span> Game &amp; Application Developer · UAE</p>
+      <h1 class="hero-title reveal">
+        Hi, I'm <span class="grad">Ashwin</span>.<br>
+        I build <span class="typed" id="typed" aria-live="polite"></span><span class="caret">|</span>
+      </h1>
+      <p class="hero-sub reveal">
+        Creative developer working across Unity, IoT hardware, projection mapping, LiDAR and laser
+        shows — blending technology and creativity to connect the digital and physical worlds.
+      </p>
+      <div class="hero-actions reveal">
+        <a href="#play" class="btn btn-primary">Play with the demos <span aria-hidden="true">→</span></a>
+        <a href="#work" class="btn btn-ghost">See what I build</a>
+      </div>
+      <ul class="hero-stats reveal">
+        <li><strong data-count="2">0</strong><span>Years at Lazulite, UAE</span></li>
+        <li><strong data-count="8">0</strong><span>Interactive specialisms</span></li>
+        <li><strong data-count="7">0</strong><span>Pro tools in my stack</span></li>
+      </ul>
+      <p class="touch-hint" aria-hidden="true"><span class="pulse"></span> Touch the wall — move, click or tap anywhere</p>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="section">
+      <div class="section-head reveal">
+        <span class="kicker">01 / About</span>
+        <h2>Where code meets the physical world.</h2>
+      </div>
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <p>
+            I'm a creative game and application developer with hands-on experience in Unity and C#,
+            specializing in interactive experiences, IoT integration, hardware-software systems and
+            immersive multimedia.
+          </p>
+          <p>
+            I'm passionate about developing engaging games, projection mapping installations and
+            audio-visual experiences — from touch-enabled walls powered by LiDAR to synchronized
+            laser and lighting shows for live events.
+          </p>
+        </div>
+        <div class="about-card reveal spot">
+          <div class="mono small muted">// quick facts</div>
+          <ul class="now">
+            <li><span class="k">role</span> Game &amp; Application Developer</li>
+            <li><span class="k">at</span> Lazulite, UAE</li>
+            <li><span class="k">core</span> Unity · C# · IoT · Projection</li>
+            <li><span class="k">speaks</span> English · Malayalam · Hindi</li>
+            <li><span class="k">off-duty</span> Volleyball, football, music &amp; gaming</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 class="subhead reveal">Strengths</h3>
+      <ul class="chips reveal">
+        <li>Game Development</li>
+        <li>Unity &amp; C#</li>
+        <li>Interactive Application Development</li>
+        <li>Gameplay Mechanics Implementation</li>
+        <li>IoT Integration</li>
+        <li>Problem-Solving</li>
+        <li>Strong Communication</li>
+      </ul>
+
+      <h3 class="subhead reveal">Software &amp; tools</h3>
+      <div class="marquee reveal" aria-label="Software and tools I work with">
+        <div class="marquee-track">
+          <span>Unity</span><span>Unreal Engine</span><span>TouchDesigner</span><span>Resolume</span><span>MadMapper</span><span>WatchOut</span><span>Pangolin Beyond</span>
+          <span>Unity</span><span>Unreal Engine</span><span>TouchDesigner</span><span>Resolume</span><span>MadMapper</span><span>WatchOut</span><span>Pangolin Beyond</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORK -->
+    <section id="work" class="section">
+      <div class="section-head reveal">
+        <span class="kicker">02 / What I build</span>
+        <h2>Projects &amp; interactive experiences.</h2>
+      </div>
+
+      <div class="filters reveal" role="group" aria-label="Filter by category">
+        <button class="filter" type="button" data-filter="all" aria-pressed="true">All</button>
+        <button class="filter" type="button" data-filter="projection" aria-pressed="false">Projection &amp; LiDAR</button>
+        <button class="filter" type="button" data-filter="laser" aria-pressed="false">Laser shows</button>
+        <button class="filter" type="button" data-filter="games" aria-pressed="false">Games &amp; apps</button>
+        <button class="filter" type="button" data-filter="iot" aria-pressed="false">IoT &amp; sensors</button>
+      </div>
+
+      <div class="projects">
+        <article class="card spot reveal" data-cat="games iot">
+          <div class="card-art a1" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>Interactive Applications</h3>
+            <p>Applications integrated with IoT hardware, sensors and custom input devices for real-world user interaction.</p>
+            <ul class="tags"><li>Unity</li><li>C#</li><li>IoT</li></ul>
+          </div>
+        </article>
+
+        <article class="card spot reveal" data-cat="projection">
+          <div class="card-art a2" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>Interactive Projection Mapping</h3>
+            <p>Projection mapping experiences with touch and gesture-based interaction.</p>
+            <ul class="tags"><li>MadMapper</li><li>TouchDesigner</li><li>Gesture</li></ul>
+          </div>
+        </article>
+
+        <article class="card spot reveal" data-cat="projection iot">
+          <div class="card-art a3" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>LiDAR-Based Interactive Systems</h3>
+            <p>LiDAR-enabled solutions that transform walls and surfaces into interactive touch displays using projectors.</p>
+            <ul class="tags"><li>LiDAR</li><li>Projectors</li><li>Touch</li></ul>
+          </div>
+        </article>
+
+        <article class="card spot reveal" data-cat="projection">
+          <div class="card-art a4" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>Projection Mapping Installations</h3>
+            <p>Immersive projection mapping installations produced for events and exhibitions.</p>
+            <ul class="tags"><li>Resolume</li><li>WatchOut</li><li>Events</li></ul>
+          </div>
+        </article>
+
+        <article class="card spot reveal" data-cat="games">
+          <div class="card-art a5" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>Arcade &amp; Casual Games</h3>
+            <p>Engaging arcade and casual games with custom hardware integration.</p>
+            <ul class="tags"><li>Unity</li><li>C#</li><li>Custom hardware</li></ul>
+          </div>
+        </article>
+
+        <article class="card spot reveal" data-cat="laser">
+          <div class="card-art a6" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>Laser Show Programming</h3>
+            <p>Laser effects designed and synchronized for live events and multimedia productions.</p>
+            <ul class="tags"><li>Pangolin Beyond</li><li>Lasers</li><li>Live</li></ul>
+          </div>
+        </article>
+
+        <article class="card spot reveal" data-cat="laser projection">
+          <div class="card-art a7" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>Laser Mapping &amp; Multimedia Shows</h3>
+            <p>Synchronized laser, video and lighting systems programmed for large-scale multimedia presentations.</p>
+            <ul class="tags"><li>Laser</li><li>Video</li><li>Lighting</li></ul>
+          </div>
+        </article>
+
+        <article class="card spot reveal" data-cat="iot">
+          <div class="card-art a8" aria-hidden="true"></div>
+          <div class="card-body">
+            <h3>Sensor-Based Experiences</h3>
+            <p>Interactive environments built with motion sensors, pressure sensors and other IoT technologies.</p>
+            <ul class="tags"><li>Sensors</li><li>IoT</li><li>Embedded</li></ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- PLAYGROUND -->
+    <section id="play" class="section">
+      <div class="section-head reveal">
+        <span class="kicker">03 / Playground</span>
+        <h2>Don't just read it. Play with it.</h2>
+        <p class="lead">Two tiny demos inspired by what I do for a living — program a laser show, then test your reflexes on a touch wall.</p>
+      </div>
+
+      <!-- Laser designer -->
+      <div class="panel reveal">
+        <div class="panel-head">
+          <div>
+            <h3>Laser Show Designer</h3>
+            <p class="muted small">Pick a pattern and tweak the beams. Move your pointer over the stage to steer the show.</p>
+          </div>
+        </div>
+        <canvas id="laser" class="stage stage-laser" aria-label="Interactive laser show preview"></canvas>
+        <div class="controls">
+          <div class="ctl">
+            <span class="ctl-label">Pattern</span>
+            <div class="seg" id="patterns" role="group" aria-label="Laser pattern">
+              <button type="button" data-pattern="lissajous" aria-pressed="true">Lissajous</button>
+              <button type="button" data-pattern="rose" aria-pressed="false">Rose</button>
+              <button type="button" data-pattern="spiral" aria-pressed="false">Spiral</button>
+              <button type="button" data-pattern="star" aria-pressed="false">Star</button>
+            </div>
+          </div>
+          <label class="ctl">
+            <span class="ctl-label">Beams <output id="beamsOut">7</output></span>
+            <input type="range" id="beams" min="1" max="16" value="7">
+          </label>
+          <label class="ctl">
+            <span class="ctl-label">Speed <output id="speedOut">1.0×</output></span>
+            <input type="range" id="speed" min="0.2" max="3" step="0.1" value="1">
+          </label>
+          <div class="ctl">
+            <span class="ctl-label">Color</span>
+            <button type="button" class="toggle" id="rainbow" aria-pressed="false">Rainbow</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game -->
+      <div class="panel reveal">
+        <div class="panel-head">
+          <div>
+            <h3>Touch Wall Challenge</h3>
+            <p class="muted small">Signals pop up on the wall — tap them before they fade. Chain hits to build a combo. 30 seconds.</p>
+          </div>
+          <ul class="hud" aria-live="polite">
+            <li>Score <b id="hudScore">0</b></li>
+            <li>Combo <b id="hudCombo">×1</b></li>
+            <li>Time <b id="hudTime">30</b></li>
+            <li>Best <b id="hudBest">0</b></li>
+          </ul>
+        </div>
+        <div class="game-wrap">
+          <canvas id="game" class="stage stage-game" aria-label="Touch Wall Challenge game. Use a mouse or touch to play."></canvas>
+          <div class="game-overlay" id="gameOverlay">
+            <h4 id="gameTitle">Ready?</h4>
+            <p id="gameText" class="muted">Tap the glowing signals before they vanish.</p>
+            <button type="button" class="btn btn-primary" id="gameStart">Start game</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section id="experience" class="section">
+      <div class="section-head reveal">
+        <span class="kicker">04 / Experience</span>
+        <h2>Where I've worked.</h2>
+      </div>
+      <ol class="timeline">
+        <li class="reveal">
+          <span class="when mono">2024 — Present</span>
+          <div>
+            <h3>Game &amp; Application Developer <span class="muted">· Lazulite, UAE</span></h3>
+            <p>Over two years building interactive games and applications, hardware-integrated installations, projection mapping, LiDAR touch systems and laser shows for live events and exhibitions.</p>
+          </div>
+        </li>
+        <li class="reveal">
+          <span class="when mono">2023 — 2024</span>
+          <div>
+            <h3>Game Developer Intern</h3>
+            <p>More than a year of hands-on internship experience developing games and interactive applications in Unity.</p>
+          </div>
+        </li>
+      </ol>
+
+      <h3 class="subhead reveal" style="margin-top:72px">Education</h3>
+      <ol class="timeline">
+        <li class="reveal">
+          <span class="when mono">2022 — 2023</span>
+          <div>
+            <h3>Unity Game Development <span class="muted">· SelfStack</span></h3>
+            <p>Focused training in game development with Unity.</p>
+          </div>
+        </li>
+        <li class="reveal">
+          <span class="when mono">2017 — 2020</span>
+          <div>
+            <h3>Bachelor of English Literature <span class="muted">· M G University</span></h3>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section contact">
+      <div class="reveal">
+        <span class="kicker">05 / Contact</span>
+        <h2 class="big">Let's build something<br><span class="grad">unforgettable.</span></h2>
+        <p class="hero-sub">Interactive installation, game or hardware-driven app in mind? Let's talk.</p>
+        <div class="contact-actions">
+          <a href="mailto:ckashwinack@gmail.com" class="btn btn-primary btn-lg">ckashwinack@gmail.com</a>
+          <button type="button" class="btn btn-ghost btn-lg" id="copyEmail" data-email="ckashwinack@gmail.com">Copy email</button>
+        </div>
+        <p class="loc muted">Based in the UAE · from Kozhikode, Kerala</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>© <span id="year"></span> Ashwin CK</span>
+    <a href="#top">Back to top ↑</a>
+  </footer>
+
+  <script>
+(() => {
+  const root = document.documentElement;
+  root.classList.add("js");
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const isPixel = () => root.dataset.style === "pixel";
+  const TAU = Math.PI * 2;
+  const store = {
+    get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} },
+  };
+
+  $("#year").textContent = new Date().getFullYear();
+
+  /* ---------- Theme colors (read by canvases) ---------- */
+  const colors = { a: "139, 92, 246", b: "34, 211, 238" };
+  const readColors = () => {
+    const cs = getComputedStyle(root);
+    colors.a = cs.getPropertyValue("--accent-rgb").trim() || colors.a;
+    colors.b = cs.getPropertyValue("--accent2-rgb").trim() || colors.b;
+  };
+  readColors();
+
+  /* ---------- Toast ---------- */
+  const toast = document.createElement("div");
+  toast.className = "toast"; toast.setAttribute("role", "status");
+  document.body.appendChild(toast);
+  let toastTimer;
+  const showToast = (msg) => {
+    toast.textContent = msg; toast.classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+  };
+
+  /* ---------- Theme switcher ---------- */
+  const THEMES = [
+    ["violet", "Violet", "#8b5cf6", "#22d3ee"], ["ember", "Ember", "#ff7a1a", "#ff3d81"],
+    ["emerald", "Emerald", "#10d98c", "#2dd4ff"], ["neon", "Neon", "#ff2bd6", "#7c3aff"],
+    ["ocean", "Ocean", "#3b82f6", "#5eead4"], ["gold", "Gold", "#f5c04a", "#ff8a3d"],
+    ["mono", "Mono", "#ffffff", "#9a9aae"], ["paper", "Paper", "#5b3df5", "#f6f4ee"],
+    ["arcade", "Arcade", "#00ff9c", "#ff3cac", true], ["gameboy", "Gameboy", "#9bbc0f", "#e0f8a0", true],
+    ["sunset", "Sunset", "#ff9e3d", "#ff4d8d", true],
+  ];
+  const themer = document.createElement("div");
+  themer.className = "themer";
+  themer.innerHTML = `
+    <button class="themer-btn" aria-label="Change color theme" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.8-.8 1.8-1.7 0-.5-.2-.9-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1 .8-1.7 1.8-1.7H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7.5" r="1"/><circle cx="14.5" cy="7.5" r="1"/></svg>
+    </button>
+    <div class="themer-panel" role="group" aria-label="Color themes">
+      <div class="themer-title">Color theme · press T</div>
+      <div class="swatches"></div>
+    </div>`;
+  document.body.appendChild(themer);
+  const swatchBox = $(".swatches", themer);
+  const themeBtn = $(".themer-btn", themer);
+  let currentTheme = root.dataset.theme || "violet";
+  let afterTheme = () => {};
+  const applyTheme = (name, save) => {
+    currentTheme = name;
+    if (name === "violet") delete root.dataset.theme; else root.dataset.theme = name;
+    const entry = THEMES.find((t) => t[0] === name);
+    if (entry && entry[4]) root.dataset.style = "pixel"; else delete root.dataset.style;
+    $$(".swatch", swatchBox).forEach((s) => s.setAttribute("aria-pressed", String(s.dataset.theme === name)));
+    if (save) store.set("theme", name === "violet" ? "" : name);
+    readColors();
+    afterTheme();
+  };
+  THEMES.forEach(([key, label, a, b, px]) => {
+    const s = document.createElement("button");
+    s.className = px ? "swatch px" : "swatch"; s.dataset.theme = key; s.type = "button";
+    s.innerHTML = `<i style="background:linear-gradient(135deg,${a},${b})"></i>${label}`;
+    s.addEventListener("click", () => applyTheme(key, true));
+    swatchBox.appendChild(s);
+  });
+  themeBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const open = themer.classList.toggle("open");
+    themeBtn.setAttribute("aria-expanded", String(open));
+  });
+  document.addEventListener("click", (e) => {
+    if (!themer.contains(e.target)) { themer.classList.remove("open"); themeBtn.setAttribute("aria-expanded", "false"); }
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") themer.classList.remove("open");
+    if ((e.key === "t" || e.key === "T") && !e.ctrlKey && !e.metaKey && !e.altKey && !/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) {
+      const i = THEMES.findIndex((t) => t[0] === currentTheme);
+      const next = THEMES[(i + 1) % THEMES.length];
+      applyTheme(next[0], true);
+      showToast(`Theme: ${next[1]}`);
+    }
+  });
+  applyTheme(currentTheme, false);
+
+  /* ---------- Nav: scrolled style, progress bar, scroll-spy ---------- */
+  const nav = $("#nav");
+  const bar = $("#progress");
+  const onScroll = () => {
+    nav.classList.toggle("scrolled", scrollY > 24);
+    const max = root.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${max > 0 ? Math.min(scrollY / max, 1) : 0})`;
+  };
+  onScroll();
+  addEventListener("scroll", onScroll, { passive: true });
+  addEventListener("resize", onScroll);
+
+  const navLinks = $$('.nav nav a[href^="#"]');
+  const spy = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      navLinks.forEach((a) => a.setAttribute("aria-current", String(a.getAttribute("href") === `#${e.target.id}`)));
+    });
+  }, { rootMargin: "-45% 0px -50% 0px" });
+  $$("main section[id]").forEach((s) => spy.observe(s));
+
+  /* ---------- Typing headline ---------- */
+  const phrases = ["interactive experiences.", "games in Unity.", "projection mapping shows.", "laser & LiDAR magic."];
+  const typedEl = $("#typed");
+  if (reduceMotion) {
+    typedEl.textContent = phrases[0];
+  } else {
+    let p = 0, c = 0, deleting = false;
+    const tick = () => {
+      const word = phrases[p];
+      typedEl.textContent = word.slice(0, c);
+      if (!deleting && c === word.length) { deleting = true; return setTimeout(tick, 1600); }
+      if (deleting && c === 0) { deleting = false; p = (p + 1) % phrases.length; }
+      c += deleting ? -1 : 1;
+      setTimeout(tick, deleting ? 35 : 80);
+    };
+    tick();
+  }
+
+  /* ---------- Reveal on scroll, counters, heading scramble ---------- */
+  const animateCount = (el) => {
+    const target = +el.dataset.count;
+    if (reduceMotion) { el.textContent = target; return; }
+    const start = performance.now(), dur = 1400;
+    const step = (t) => {
+      const k = Math.min((t - start) / dur, 1);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+  const GLYPHS = "!<>-_/[]{}=+*^?#01";
+  const scramble = (el) => {
+    if (reduceMotion || el.children.length) return;
+    const final = el.textContent;
+    el.setAttribute("aria-label", final);
+    const start = performance.now(), dur = 750;
+    const step = (now) => {
+      const k = Math.min((now - start) / dur, 1);
+      el.textContent = [...final].map((ch, i) =>
+        ch === " " || i < final.length * k ? ch : GLYPHS[(Math.random() * GLYPHS.length) | 0]).join("");
+      if (k < 1) requestAnimationFrame(step); else el.textContent = final;
+    };
+    requestAnimationFrame(step);
+  };
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      el.classList.add("in");
+      $$("[data-count]", el).forEach(animateCount);
+      $$(".section-head h2", el).forEach(scramble);
+      setTimeout(() => el.classList.add("done"), 1100);
+      io.unobserve(el);
+    });
+  }, { threshold: 0.12 });
+  $$(".reveal").forEach((el, i) => { el.style.setProperty("--d", `${(i % 4) * 0.08}s`); io.observe(el); });
+
+  /* ---------- Spotlight + 3D tilt on cards ---------- */
+  $$(".spot").forEach((el) => {
+    el.addEventListener("pointermove", (e) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      el.style.setProperty("--my", `${e.clientY - r.top}px`);
+    });
+  });
+  if (finePointer && !reduceMotion) {
+    $$(".card").forEach((card) => {
+      card.addEventListener("pointerenter", () => card.classList.add("tilting"));
+      card.addEventListener("pointermove", (e) => {
+        if (isPixel()) return;
+        const r = card.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
+        card.style.transform = `perspective(900px) rotateX(${(-py * 8).toFixed(2)}deg) rotateY(${(px * 10).toFixed(2)}deg) translateY(-6px)`;
+      });
+      card.addEventListener("pointerleave", () => { card.classList.remove("tilting"); card.style.transform = ""; });
+    });
+    $$(".btn").forEach((b) => {
+      b.addEventListener("pointermove", (e) => {
+        if (isPixel()) return;
+        const r = b.getBoundingClientRect();
+        b.style.transform = `translate(${((e.clientX - r.left - r.width / 2) * 0.22).toFixed(1)}px, ${((e.clientY - r.top - r.height / 2) * 0.32).toFixed(1)}px)`;
+      });
+      b.addEventListener("pointerleave", () => { b.style.transform = ""; });
+    });
+  }
+
+  /* ---------- Project filters ---------- */
+  const filters = $$(".filter");
+  const cards = $$(".card");
+  filters.forEach((btn) => btn.addEventListener("click", () => {
+    const f = btn.dataset.filter;
+    filters.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+    cards.forEach((card) => {
+      const show = f === "all" || card.dataset.cat.split(" ").includes(f);
+      card.hidden = !show;
+      if (show) {
+        card.classList.remove("pop"); void card.offsetWidth; card.classList.add("pop");
+        card.addEventListener("animationend", () => card.classList.remove("pop"), { once: true });
+      }
+    });
+  }));
+
+  /* ---------- Copy email ---------- */
+  $("#copyEmail").addEventListener("click", async (e) => {
+    const email = e.currentTarget.dataset.email;
+    try { await navigator.clipboard.writeText(email); showToast("Email copied to clipboard"); }
+    catch (err) { window.location.href = `mailto:${email}`; }
+  });
+
+  /* ---------- Custom cursor (fine pointers) ---------- */
+  if (finePointer && !reduceMotion) {
+    const dot = document.createElement("div"), ring = document.createElement("div");
+    dot.className = "cursor-dot"; ring.className = "cursor-ring";
+    document.body.append(ring, dot);
+    let x = -100, y = -100, rx = -100, ry = -100;
+    addEventListener("pointermove", (e) => { x = e.clientX; y = e.clientY; dot.style.transform = `translate(${x}px,${y}px)`; });
+    document.addEventListener("pointerover", (e) => ring.classList.toggle("active", !!e.target.closest("a, button, .card, input, canvas")));
+    addEventListener("pointerdown", () => ring.classList.add("down"));
+    addEventListener("pointerup", () => ring.classList.remove("down"));
+    const follow = () => { rx = lerp(rx, x, 0.18); ry = lerp(ry, y, 0.18); ring.style.transform = `translate(${rx}px,${ry}px)`; requestAnimationFrame(follow); };
+    follow();
+  }
+
+  /* ============================================================
+     BACKGROUND "TOUCH WALL": a dot grid that reacts to pointer + taps
+     ============================================================ */
+  const bg = $("#bg"), bctx = bg.getContext("2d");
+  const GAP = 34;
+  let BW = 0, BH = 0, dots = [];
+  const ptr = { x: -9999, y: -9999 };
+  const ripples = [];
+  const sizeBg = () => {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    BW = innerWidth; BH = innerHeight;
+    bg.width = BW * dpr; bg.height = BH * dpr;
+    bctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    dots = [];
+    for (let y = GAP / 2; y < BH + GAP; y += GAP) for (let x = GAP / 2; x < BW + GAP; x += GAP) dots.push([x, y]);
+  };
+  addEventListener("resize", () => { sizeBg(); if (reduceMotion) drawBg(performance.now()); });
+  addEventListener("pointermove", (e) => { ptr.x = e.clientX; ptr.y = e.clientY; }, { passive: true });
+  document.addEventListener("pointerleave", () => { ptr.x = ptr.y = -9999; });
+  addEventListener("pointerdown", (e) => {
+    if (reduceMotion) return;
+    ripples.push({ x: e.clientX, y: e.clientY, t0: performance.now() });
+    if (ripples.length > 6) ripples.shift();
+  }, { passive: true });
+
+  const drawBg = (now) => {
+    bctx.clearRect(0, 0, BW, BH);
+    for (let i = ripples.length - 1; i >= 0; i--) if (now - ripples[i].t0 > 1800) ripples.splice(i, 1);
+    const R = 150, pix = isPixel();
+    for (let i = 0; i < dots.length; i++) {
+      let [x, y] = dots[i];
+      let e = reduceMotion ? 0 : 0.06 + 0.06 * Math.sin((x + y) * 0.012 + now * 0.0012);
+      let ox = 0, oy = 0;
+      const dx = x - ptr.x, dy = y - ptr.y, d = Math.hypot(dx, dy);
+      if (d < R) { const f = (1 - d / R) ** 2; ox += (dx / (d || 1)) * f * 16; oy += (dy / (d || 1)) * f * 16; e += f; }
+      for (let k = 0; k < ripples.length; k++) {
+        const r = ripples[k], age = now - r.t0, rr = age * 0.55, life = 1 - age / 1800;
+        const rdx = x - r.x, rdy = y - r.y, rd = Math.hypot(rdx, rdy), band = Math.abs(rd - rr);
+        if (band < 70) { const f = (1 - band / 70) * life; ox += (rdx / (rd || 1)) * f * 14; oy += (rdy / (rd || 1)) * f * 14; e += f; }
+      }
+      e = Math.min(e, 1.4);
+      bctx.fillStyle = e > 0.5 ? `rgba(${colors.b}, ${Math.min(0.25 + e * 0.6, 1)})` : `rgba(${colors.a}, ${0.16 + e * 0.9})`;
+      if (pix) {
+        const s = 2 + Math.round(e * 3) * 2;
+        bctx.fillRect(Math.round((x + ox) / 2) * 2 - s / 2, Math.round((y + oy) / 2) * 2 - s / 2, s, s);
+      } else {
+        bctx.beginPath(); bctx.arc(x + ox, y + oy, 1 + e * 2.4, 0, TAU); bctx.fill();
+      }
+    }
+  };
+  sizeBg();
+  if (reduceMotion) drawBg(performance.now());
+
+  /* ============================================================
+     LASER SHOW DESIGNER
+     ============================================================ */
+  const laserCv = $("#laser"), lctx = laserCv.getContext("2d");
+  const laser = { pattern: "lissajous", beams: 7, speed: 1, rainbow: false, t: 0, nx: 0.5, ny: 0.5, w: 0, h: 0, visible: false };
+  const PATTERNS = {
+    lissajous: (u, t) => [Math.sin(3 * u * TAU + t), Math.sin(2 * u * TAU)],
+    rose: (u, t) => { const th = u * TAU, r = Math.cos(5 * th + t * 0.5); return [r * Math.cos(th), r * Math.sin(th)]; },
+    spiral: (u, t) => { const th = u * TAU * 3 + t, r = u; return [r * Math.cos(th), r * Math.sin(th)]; },
+    star: (u, t) => { const th = u * TAU, r = 0.65 + 0.35 * Math.cos(5 * th + t); return [r * Math.cos(th), r * Math.sin(th)]; },
+  };
+  const sizeLaser = () => {
+    const r = laserCv.getBoundingClientRect(), dpr = isPixel() ? 0.25 : Math.min(devicePixelRatio || 1, 2);
+    laser.w = r.width; laser.h = r.height;
+    laserCv.width = r.width * dpr; laserCv.height = r.height * dpr;
+    lctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    lctx.fillStyle = "#05050a"; lctx.fillRect(0, 0, laser.w, laser.h);
+  };
+  laserCv.addEventListener("pointermove", (e) => {
+    const r = laserCv.getBoundingClientRect();
+    laser.nx = (e.clientX - r.left) / r.width; laser.ny = (e.clientY - r.top) / r.height;
+  });
+  laserCv.addEventListener("pointerleave", () => { laser.nx = 0.5; laser.ny = 0.5; });
+
+  $$("#patterns button").forEach((b) => b.addEventListener("click", () => {
+    laser.pattern = b.dataset.pattern;
+    $$("#patterns button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  }));
+  $("#beams").addEventListener("input", (e) => { laser.beams = +e.target.value; $("#beamsOut").textContent = e.target.value; });
+  $("#speed").addEventListener("input", (e) => { laser.speed = +e.target.value; $("#speedOut").textContent = `${(+e.target.value).toFixed(1)}×`; });
+  $("#rainbow").addEventListener("click", (e) => {
+    laser.rainbow = !laser.rainbow; e.currentTarget.setAttribute("aria-pressed", String(laser.rainbow));
+  });
+
+  const drawLaser = (dt) => {
+    const { w, h } = laser;
+    laser.t += dt * laser.speed;
+    const t = laser.t;
+    lctx.globalCompositeOperation = "source-over";
+    lctx.shadowBlur = 0;
+    lctx.fillStyle = "rgba(5, 5, 10, 0.24)";
+    lctx.fillRect(0, 0, w, h);
+    lctx.globalCompositeOperation = "lighter";
+
+    const ex = w / 2, ey = h + 10, cx = w / 2, cy = h * 0.44;
+    const S = Math.min(w * 0.42, h * 0.78);
+    const ang = (laser.nx - 0.5) * Math.PI * 0.9;
+    const squash = 0.75 + (1 - laser.ny) * 0.45;
+    const fn = PATTERNS[laser.pattern];
+    const ca = Math.cos(ang), sa = Math.sin(ang);
+    const proj = (u) => {
+      const [px, py] = fn(u, t);
+      const x = px * S, y = py * S * squash;
+      return [cx + x * ca - y * sa, cy + x * sa + y * ca];
+    };
+    const col = (i, n, a) => laser.rainbow
+      ? `hsla(${((i / n) * 360 + t * 40) % 360}, 95%, 62%, ${a})`
+      : `rgba(${i % 2 ? colors.b : colors.a}, ${a})`;
+
+    // projected pattern trace
+    const N = 260, P = isPixel(), lw = P ? 3.2 : 1;
+    lctx.lineWidth = 1.6 * lw; lctx.lineJoin = "round";
+    lctx.shadowBlur = P ? 0 : 10;
+    for (let seg = 0; seg < 4; seg++) {
+      lctx.beginPath();
+      for (let i = seg * (N / 4); i <= (seg + 1) * (N / 4); i++) {
+        const [x, y] = proj(i / N);
+        i === seg * (N / 4) ? lctx.moveTo(x, y) : lctx.lineTo(x, y);
+      }
+      const c = col(seg, 4, P ? 0.3 : 0.17);
+      lctx.strokeStyle = c; lctx.shadowColor = c; lctx.stroke();
+    }
+
+    // beams from the emitter
+    for (let i = 0; i < laser.beams; i++) {
+      const u = (i / laser.beams + t * 0.035) % 1;
+      const [px, py] = proj(u);
+      const g = lctx.createLinearGradient(ex, ey, px, py);
+      g.addColorStop(0, col(i, laser.beams, 0.04));
+      g.addColorStop(1, col(i, laser.beams, 0.85));
+      lctx.strokeStyle = g; lctx.shadowColor = col(i, laser.beams, 0.9);
+      lctx.lineWidth = 1.5 * lw; lctx.shadowBlur = P ? 0 : 12;
+      lctx.beginPath(); lctx.moveTo(ex, ey); lctx.lineTo(px, py); lctx.stroke();
+      lctx.shadowBlur = 0;
+      lctx.fillStyle = "rgba(255,255,255,.9)";
+      if (P) lctx.fillRect(px - 4, py - 4, 8, 8);
+      else { lctx.beginPath(); lctx.arc(px, py, 2.4, 0, TAU); lctx.fill(); }
+    }
+    lctx.globalCompositeOperation = "source-over";
+  };
+
+  /* ============================================================
+     TOUCH WALL CHALLENGE (reflex game)
+     ============================================================ */
+  const gameCv = $("#game"), gctx = gameCv.getContext("2d");
+  const overlay = $("#gameOverlay"), hud = { s: $("#hudScore"), c: $("#hudCombo"), t: $("#hudTime"), b: $("#hudBest") };
+  const G = { state: "idle", score: 0, combo: 0, time: 30, best: +(store.get("bestScore") || 0), targets: [], fx: [], spawn: 0, w: 0, h: 0, shake: 0, now: 0, visible: false };
+  hud.b.textContent = G.best;
+  const sizeGame = () => {
+    const r = gameCv.getBoundingClientRect(), dpr = isPixel() ? 0.5 : Math.min(devicePixelRatio || 1, 2);
+    G.w = r.width; G.h = r.height;
+    gameCv.width = r.width * dpr; gameCv.height = r.height * dpr;
+    gctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+  const mult = () => Math.min(1 + Math.floor(G.combo / 4), 5);
+  const setHud = () => {
+    hud.s.textContent = G.score; hud.c.textContent = `×${mult()}`;
+    hud.t.textContent = Math.max(0, Math.ceil(G.time)); hud.b.textContent = G.best;
+  };
+  const startGame = () => {
+    Object.assign(G, { state: "playing", score: 0, combo: 0, time: 30, targets: [], fx: [], spawn: 0 });
+    overlay.classList.add("off"); setHud();
+  };
+  const endGame = () => {
+    G.state = "over";
+    const isBest = G.score > G.best;
+    if (isBest) { G.best = G.score; store.set("bestScore", String(G.best)); }
+    $("#gameTitle").textContent = isBest && G.score > 0 ? "New best!" : "Time's up";
+    $("#gameText").textContent = `You scored ${G.score}. Best: ${G.best}.`;
+    $("#gameStart").textContent = "Play again";
+    overlay.classList.remove("off"); setHud();
+  };
+  $("#gameStart").addEventListener("click", startGame);
+
+  const burst = (x, y, text) => {
+    for (let i = 0; i < 14; i++) {
+      const a = Math.random() * TAU, s = 80 + Math.random() * 180;
+      G.fx.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 0.55, max: 0.55 });
+    }
+    G.fx.push({ x, y, text, life: 0.8, max: 0.8, vy: -50 });
+  };
+  gameCv.addEventListener("pointerdown", (e) => {
+    if (G.state !== "playing") return;
+    const r = gameCv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    let hit = null, best = Infinity;
+    G.targets.forEach((tg) => {
+      const rad = Math.max(tg.r * (1 - (G.now - tg.born) / tg.life), 8) + 10, d = Math.hypot(tg.x - x, tg.y - y);
+      if (d <= rad && d < best) { hit = tg; best = d; }
+    });
+    if (hit) {
+      const left = 1 - (G.now - hit.born) / hit.life;
+      G.combo++;
+      const pts = Math.round((10 + 15 * left) * mult());
+      G.score += pts; burst(hit.x, hit.y, `+${pts}`);
+      G.targets.splice(G.targets.indexOf(hit), 1);
+    } else {
+      G.combo = 0; G.shake = 0.18; G.fx.push({ x, y, text: "miss", life: 0.5, max: 0.5, vy: -30, miss: true });
+    }
+    setHud();
+  });
+
+  const updateGame = (dt, now) => {
+    G.now = now / 1000;
+    if (G.state === "playing") {
+      G.time -= dt;
+      G.spawn -= dt;
+      const elapsed = 30 - G.time;
+      if (G.spawn <= 0 && G.targets.length < 4) {
+        const r = 28 + Math.random() * 14, pad = r + 14;
+        G.targets.push({ x: pad + Math.random() * (G.w - pad * 2), y: pad + Math.random() * (G.h - pad * 2), r, born: G.now, life: Math.max(1.5 - elapsed * 0.025, 0.8), hue: Math.random() < 0.5 });
+        G.spawn = Math.max(0.7 - elapsed * 0.012, 0.38);
+      }
+      for (let i = G.targets.length - 1; i >= 0; i--) {
+        if (G.now - G.targets[i].born > G.targets[i].life) { G.targets.splice(i, 1); G.combo = 0; setHud(); }
+      }
+      if (G.time <= 0) endGame();
+      else hud.t.textContent = Math.ceil(G.time);
+    }
+    G.shake = Math.max(0, G.shake - dt);
+    for (let i = G.fx.length - 1; i >= 0; i--) {
+      const f = G.fx[i]; f.life -= dt;
+      if (f.vx !== undefined) { f.x += f.vx * dt; f.y += f.vy * dt; f.vx *= 0.94; f.vy *= 0.94; } else f.y += f.vy * dt;
+      if (f.life <= 0) G.fx.splice(i, 1);
+    }
+  };
+  const drawGame = () => {
+    const { w, h } = G;
+    gctx.clearRect(0, 0, w, h);
+    gctx.save();
+    if (G.shake > 0) gctx.translate((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6);
+    gctx.fillStyle = "#05050a"; gctx.fillRect(-10, -10, w + 20, h + 20);
+    // projector grid
+    gctx.strokeStyle = "rgba(255,255,255,.045)"; gctx.lineWidth = 1;
+    for (let x = 0; x < w; x += 40) { gctx.beginPath(); gctx.moveTo(x + 0.5, 0); gctx.lineTo(x + 0.5, h); gctx.stroke(); }
+    for (let y = 0; y < h; y += 40) { gctx.beginPath(); gctx.moveTo(0, y + 0.5); gctx.lineTo(w, y + 0.5); gctx.stroke(); }
+    G.targets.forEach((tg) => {
+      const k = 1 - (G.now - tg.born) / tg.life, rad = Math.max(tg.r * k, 4), c = tg.hue ? colors.b : colors.a;
+      if (isPixel()) {
+        const s = Math.max(8, Math.round((rad * 2) / 8) * 8), x0 = Math.round(tg.x - s / 2), y0 = Math.round(tg.y - s / 2);
+        gctx.fillStyle = `rgba(${c}, .9)`; gctx.fillRect(x0, y0, s, s);
+        gctx.strokeStyle = "#fff"; gctx.lineWidth = 2; gctx.strokeRect(x0, y0, s, s);
+        return;
+      }
+      const grad = gctx.createRadialGradient(tg.x, tg.y, 0, tg.x, tg.y, rad * 1.8);
+      grad.addColorStop(0, `rgba(${c}, .95)`); grad.addColorStop(0.45, `rgba(${c}, .45)`); grad.addColorStop(1, `rgba(${c}, 0)`);
+      gctx.fillStyle = grad; gctx.beginPath(); gctx.arc(tg.x, tg.y, rad * 1.8, 0, TAU); gctx.fill();
+      gctx.strokeStyle = "rgba(255,255,255,.9)"; gctx.lineWidth = 2;
+      gctx.beginPath(); gctx.arc(tg.x, tg.y, rad, 0, TAU); gctx.stroke();
+    });
+    G.fx.forEach((f) => {
+      const a = Math.max(f.life / f.max, 0);
+      if (f.text) {
+        gctx.font = isPixel() ? "22px 'VT323', monospace" : "600 16px 'JetBrains Mono', monospace"; gctx.textAlign = "center";
+        gctx.fillStyle = f.miss ? `rgba(255,90,110,${a})` : `rgba(255,255,255,${a})`; gctx.fillText(f.text, f.x, f.y);
+      } else {
+        gctx.fillStyle = `rgba(${colors.b}, ${a})`;
+        if (isPixel()) gctx.fillRect(Math.round(f.x), Math.round(f.y), 4, 4);
+        else { gctx.beginPath(); gctx.arc(f.x, f.y, 2.5 * a + 0.5, 0, TAU); gctx.fill(); }
+      }
+    });
+    gctx.restore();
+  };
+
+  /* ---------- Visibility + master loop ---------- */
+  const vis = new IntersectionObserver((entries) => entries.forEach((e) => {
+    if (e.target === laserCv) laser.visible = e.isIntersecting;
+    if (e.target === gameCv) G.visible = e.isIntersecting;
+  }));
+  vis.observe(laserCv); vis.observe(gameCv);
+  const sizeStages = () => { sizeLaser(); sizeGame(); };
+  addEventListener("resize", sizeStages);
+  sizeStages();
+  afterTheme = sizeStages;
+
+  let last = performance.now();
+  const frame = (now) => {
+    const dt = Math.min((now - last) / 1000, 0.05); last = now;
+    if (!document.hidden) {
+      if (!reduceMotion) drawBg(now);
+      if (laser.visible && !reduceMotion) drawLaser(dt);
+      if (G.visible || G.state === "playing") { updateGame(dt, now); drawGame(); }
+    }
+    requestAnimationFrame(frame);
+  };
+  if (reduceMotion) { drawLaser(0.5); G.now = 0; drawGame(); }
+  requestAnimationFrame(frame);
+})();
+
+</script>
+</body>
+</html>
