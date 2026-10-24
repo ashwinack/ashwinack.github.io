@@ -169,18 +169,6 @@ h3 { font-size: 1.25rem; line-height: 1.24; font-weight: 500; letter-spacing: -.
 .cv { display: block; width: 100%; aspect-ratio: 16 / 10; border-radius: var(--r-input); background: #05050a; touch-action: manipulation; cursor: crosshair; }
 @media (max-width: 640px) { .cv { aspect-ratio: 4 / 3; } }
 
-.controls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 20px 28px; margin-top: 20px; }
-.ctl { display: grid; gap: 8px; min-width: 140px; }
-.ctl-label { font-size: .875rem; color: var(--text-soft); }
-.ctl-label output { color: var(--accent2); margin-left: 6px; font-variant-numeric: tabular-nums; }
-.seg { display: flex; flex-wrap: wrap; gap: 6px; }
-.seg button, .toggle {
-  font: inherit; font-size: .875rem; padding: 10px 14px; border: 0; border-radius: var(--r-ctl); cursor: pointer; touch-action: manipulation;
-  background: var(--surface-2); color: var(--text-soft); transition: background-color .15s, color .15s;
-}
-html .seg button:hover, html .toggle:hover { background: var(--hover-fill); color: var(--on-hover); }
-.seg button[aria-pressed="true"], .toggle[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); font-weight: 600; }
-input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; touch-action: manipulation; }
 
 .hud { display: flex; flex-wrap: wrap; gap: 6px; font-size: .875rem; color: var(--text-soft); }
 .hud li { padding: 6px 12px; border-radius: var(--r-ctl); background: var(--surface-2); font-variant-numeric: tabular-nums; }
@@ -421,39 +409,10 @@ html .swatch:hover { background: var(--hover-fill); color: var(--on-hover); }
     <section id="play" class="wide play" data-reveal aria-labelledby="play-title">
       <div class="play-head">
         <h2 id="play-title" class="rv">Don’t just read it. Play with it.</h2>
-        <p class="lead rv">Two small demos from my day job. Program a laser show, then test your reflexes on a touch wall.</p>
+        <p class="lead rv">Two small arcade games. Test your reflexes on a touch wall, then take on the CPU at Pong.</p>
       </div>
 
       <div class="play-grid">
-        <div class="panel rv">
-          <h3>Laser show designer</h3>
-          <p class="note">Pick a pattern and tune the beams. Move over the stage to steer the show.</p>
-          <canvas id="laser" class="cv cv-laser" role="img" aria-label="Interactive laser show preview"></canvas>
-          <div class="controls">
-            <div class="ctl">
-              <span class="ctl-label" id="patternLabel">Pattern</span>
-              <div class="seg" id="patterns" role="group" aria-labelledby="patternLabel">
-                <button type="button" data-pattern="lissajous" aria-pressed="true">Lissajous</button>
-                <button type="button" data-pattern="rose" aria-pressed="false">Rose</button>
-                <button type="button" data-pattern="spiral" aria-pressed="false">Spiral</button>
-                <button type="button" data-pattern="star" aria-pressed="false">Star</button>
-              </div>
-            </div>
-            <label class="ctl">
-              <span class="ctl-label">Beams <output id="beamsOut">7</output></span>
-              <input type="range" id="beams" min="1" max="16" value="7">
-            </label>
-            <label class="ctl">
-              <span class="ctl-label">Speed <output id="speedOut">1.0×</output></span>
-              <input type="range" id="speed" min="0.2" max="3" step="0.1" value="1">
-            </label>
-            <div class="ctl">
-              <span class="ctl-label">Color</span>
-              <button type="button" class="toggle" id="rainbow" aria-pressed="false">Rainbow</button>
-            </div>
-          </div>
-        </div>
-
         <div class="panel rv">
           <div class="panel-top">
             <div>
@@ -476,6 +435,30 @@ html .swatch:hover { background: var(--hover-fill); color: var(--on-hover); }
             </div>
           </div>
           <p class="sr-only" id="gameStatus" role="status"></p>
+        </div>
+
+        <div class="panel rv">
+          <div class="panel-top">
+            <div>
+              <h3>Pong rally</h3>
+              <p class="note">Move your pointer, drag a finger or use the arrow keys to steer the left paddle. First to 5 wins.</p>
+            </div>
+            <ul class="hud">
+              <li>You <b id="pongYou">0</b></li>
+              <li>CPU <b id="pongCpu">0</b></li>
+              <li>Rally <b id="pongRally">0</b></li>
+              <li>Best rally <b id="pongBest">0</b></li>
+            </ul>
+          </div>
+          <div class="game-wrap">
+            <canvas id="pong" class="cv cv-game" role="img" aria-label="Pong game against the computer. Move the mouse, drag a finger, or use the up and down arrow keys to move your paddle."></canvas>
+            <div class="game-overlay" id="pongOverlay">
+              <h4 id="pongTitle">Ready?</h4>
+              <p id="pongText">Return the ball and beat the CPU to 5 points.</p>
+              <button type="button" class="btn btn-primary" id="pongStart">Start game</button>
+            </div>
+          </div>
+          <p class="sr-only" id="pongStatus" role="status"></p>
         </div>
       </div>
     </section>
@@ -770,72 +753,6 @@ html .swatch:hover { background: var(--hover-fill); color: var(--on-hover); }
   });
 
   /* ============================================================
-     LASER SHOW DESIGNER
-     ============================================================ */
-  const laserCv = $("#laser"), lctx = laserCv.getContext("2d");
-  const laser = { pattern: "lissajous", beams: 7, speed: 1, rainbow: false, t: 0, nx: 0.5, ny: 0.5, w: 0, h: 0, visible: false };
-  const PATTERNS = {
-    lissajous: (u, t) => [Math.sin(3 * u * TAU + t), Math.sin(2 * u * TAU)],
-    rose: (u, t) => { const th = u * TAU, r = Math.cos(5 * th + t * 0.5); return [r * Math.cos(th), r * Math.sin(th)]; },
-    spiral: (u, t) => { const th = u * TAU * 3 + t, r = u; return [r * Math.cos(th), r * Math.sin(th)]; },
-    star: (u, t) => { const th = u * TAU, r = 0.65 + 0.35 * Math.cos(5 * th + t); return [r * Math.cos(th), r * Math.sin(th)]; },
-  };
-  const sizeLaser = () => {
-    const r = laserCv.getBoundingClientRect(), dpr = isPixel() ? 0.25 : Math.min(devicePixelRatio || 1, 2);
-    laser.w = r.width; laser.h = r.height;
-    laserCv.width = Math.max(1, Math.round(r.width * dpr)); laserCv.height = Math.max(1, Math.round(r.height * dpr));
-    lctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    lctx.fillStyle = "#05050a"; lctx.fillRect(0, 0, laser.w, laser.h);
-  };
-  laserCv.addEventListener("pointermove", (e) => {
-    const r = laserCv.getBoundingClientRect(); laser.nx = (e.clientX - r.left) / r.width; laser.ny = (e.clientY - r.top) / r.height;
-  });
-  laserCv.addEventListener("pointerleave", () => { laser.nx = 0.5; laser.ny = 0.5; });
-  $$("#patterns button").forEach((b) => b.addEventListener("click", () => {
-    laser.pattern = b.dataset.pattern;
-    $$("#patterns button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
-  }));
-  $("#beams").addEventListener("input", (e) => { laser.beams = +e.target.value; $("#beamsOut").textContent = e.target.value; });
-  $("#speed").addEventListener("input", (e) => { laser.speed = +e.target.value; $("#speedOut").textContent = `${(+e.target.value).toFixed(1)}×`; });
-  $("#rainbow").addEventListener("click", (e) => {
-    laser.rainbow = !laser.rainbow; e.currentTarget.setAttribute("aria-pressed", String(laser.rainbow));
-  });
-
-  const drawLaser = (dt) => {
-    const { w, h } = laser;
-    laser.t += dt * laser.speed;
-    const t = laser.t;
-    lctx.globalCompositeOperation = "source-over"; lctx.shadowBlur = 0;
-    lctx.fillStyle = "rgba(5, 5, 10, 0.24)"; lctx.fillRect(0, 0, w, h);
-    lctx.globalCompositeOperation = "lighter";
-    const ex = w / 2, ey = h + 10, cx = w / 2, cy = h * 0.44;
-    const S = Math.min(w * 0.42, h * 0.78);
-    const ang = (laser.nx - 0.5) * Math.PI * 0.9, squash = 0.75 + (1 - laser.ny) * 0.45;
-    const fn = PATTERNS[laser.pattern], ca = Math.cos(ang), sa = Math.sin(ang);
-    const proj = (u) => { const [px, py] = fn(u, t); const x = px * S, y = py * S * squash; return [cx + x * ca - y * sa, cy + x * sa + y * ca]; };
-    const col = (i, n, a) => laser.rainbow ? `hsla(${((i / n) * 360 + t * 40) % 360}, 95%, 62%, ${a})` : `rgba(${i % 2 ? colors.b : colors.a}, ${a})`;
-    const N = 260, P = isPixel(), lw = P ? 3.2 : 1;
-    lctx.lineWidth = 1.6 * lw; lctx.lineJoin = "round"; lctx.shadowBlur = P ? 0 : 10;
-    for (let seg = 0; seg < 4; seg++) {
-      lctx.beginPath();
-      for (let i = seg * (N / 4); i <= (seg + 1) * (N / 4); i++) { const [x, y] = proj(i / N); i === seg * (N / 4) ? lctx.moveTo(x, y) : lctx.lineTo(x, y); }
-      const c = col(seg, 4, P ? 0.3 : 0.17);
-      lctx.strokeStyle = c; lctx.shadowColor = c; lctx.stroke();
-    }
-    for (let i = 0; i < laser.beams; i++) {
-      const u = (i / laser.beams + t * 0.035) % 1, [px, py] = proj(u);
-      const g = lctx.createLinearGradient(ex, ey, px, py);
-      g.addColorStop(0, col(i, laser.beams, 0.04)); g.addColorStop(1, col(i, laser.beams, 0.85));
-      lctx.strokeStyle = g; lctx.shadowColor = col(i, laser.beams, 0.9);
-      lctx.lineWidth = 1.5 * lw; lctx.shadowBlur = P ? 0 : 12;
-      lctx.beginPath(); lctx.moveTo(ex, ey); lctx.lineTo(px, py); lctx.stroke();
-      lctx.shadowBlur = 0; lctx.fillStyle = "rgba(255,255,255,.9)";
-      if (P) lctx.fillRect(px - 4, py - 4, 8, 8); else { lctx.beginPath(); lctx.arc(px, py, 2.4, 0, TAU); lctx.fill(); }
-    }
-    lctx.globalCompositeOperation = "source-over";
-  };
-
-  /* ============================================================
      TOUCH WALL CHALLENGE
      ============================================================ */
   const gameCv = $("#game"), gctx = gameCv.getContext("2d");
@@ -940,14 +857,132 @@ html .swatch:hover { background: var(--hover-fill); color: var(--on-hover); }
     gctx.restore();
   };
 
+  /* ============================================================
+     PONG: mouse, touch or keyboard against a computer paddle
+     ============================================================ */
+  const pongCv = $("#pong"), pctx = pongCv.getContext("2d");
+  const pongOverlay = $("#pongOverlay");
+  const pHud = { you: $("#pongYou"), cpu: $("#pongCpu"), rally: $("#pongRally"), best: $("#pongBest") };
+  const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+  const WIN_SCORE = 5, PAD_W = 10, PAD_GAP = 20, BALL_R = 7;
+  const P = {
+    state: "idle", w: 0, h: 0, padH: 70, yourY: 0, cpuY: 0, targetY: null, up: 0, down: 0,
+    ball: { x: 0, y: 0, vx: 0, vy: 0 }, speed: 0, serveIn: 0, trail: [],
+    you: 0, cpu: 0, rally: 0, best: +(store.get("bestRally") || 0), visible: false,
+  };
+  pHud.best.textContent = P.best;
+  const baseSpeed = () => P.w * 0.62;
+  const sizePong = () => {
+    const r = pongCv.getBoundingClientRect(), dpr = isPixel() ? 0.5 : Math.min(devicePixelRatio || 1, 2);
+    P.w = r.width; P.h = r.height; P.padH = Math.max(56, P.h * 0.24);
+    pongCv.width = Math.max(1, Math.round(r.width * dpr)); pongCv.height = Math.max(1, Math.round(r.height * dpr));
+    pctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (P.state !== "playing") { P.yourY = P.cpuY = (P.h - P.padH) / 2; P.ball.x = P.w / 2; P.ball.y = P.h / 2; }
+    else { P.yourY = clamp(P.yourY, 0, P.h - P.padH); P.cpuY = clamp(P.cpuY, 0, P.h - P.padH); }
+  };
+  const setPongHud = () => { pHud.you.textContent = P.you; pHud.cpu.textContent = P.cpu; pHud.rally.textContent = P.rally; pHud.best.textContent = P.best; };
+  const serve = (dir) => {
+    const a = (Math.random() - 0.5) * 0.8;
+    P.ball.x = P.w / 2; P.ball.y = P.h / 2; P.trail = [];
+    P.ball.vx = dir * P.speed * Math.cos(a); P.ball.vy = P.speed * Math.sin(a); P.serveIn = 0.8;
+  };
+  const startPong = () => {
+    Object.assign(P, { state: "playing", you: 0, cpu: 0, rally: 0, up: 0, down: 0, targetY: null });
+    P.speed = baseSpeed(); P.yourY = P.cpuY = (P.h - P.padH) / 2;
+    serve(Math.random() < 0.5 ? -1 : 1);
+    pongOverlay.classList.add("off"); pongCv.style.touchAction = "none"; // drag steers the paddle instead of scrolling
+    setPongHud(); $("#pongStatus").textContent = ""; startLoopRef();
+  };
+  const endPong = (youWon) => {
+    P.state = "over"; pongCv.style.touchAction = "manipulation";
+    $("#pongTitle").textContent = youWon ? "You win!" : "CPU wins";
+    $("#pongText").textContent = `Final score: you ${P.you}, CPU ${P.cpu}. Best rally: ${P.best}.`;
+    $("#pongStatus").textContent = `${youWon ? "You win" : "The CPU wins"}. Final score: you ${P.you}, CPU ${P.cpu}.`;
+    $("#pongStart").textContent = "Play again"; pongOverlay.classList.remove("off"); setPongHud();
+  };
+  $("#pongStart").addEventListener("click", startPong);
+  const steer = (e) => { const r = pongCv.getBoundingClientRect(); P.targetY = e.clientY - r.top; };
+  pongCv.addEventListener("pointermove", steer);
+  pongCv.addEventListener("pointerdown", steer);
+  const KEYS = { ArrowUp: "up", ArrowDown: "down", w: "up", W: "up", s: "down", S: "down" };
+  addEventListener("keydown", (e) => {
+    const k = KEYS[e.key];
+    if (!k || P.state !== "playing" || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+    e.preventDefault(); P[k] = 1;
+  });
+  addEventListener("keyup", (e) => { const k = KEYS[e.key]; if (k) P[k] = 0; });
+  addEventListener("blur", () => { P.up = P.down = 0; });
+
+  const updatePong = (dt) => {
+    if (P.state !== "playing") return;
+    const maxY = P.h - P.padH, b = P.ball, base = baseSpeed();
+    // your paddle: keys win over the pointer while they are held
+    if (P.up || P.down) { P.yourY += (P.down - P.up) * P.h * 0.9 * dt; P.targetY = null; }
+    else if (P.targetY !== null) P.yourY = P.targetY - P.padH / 2;
+    P.yourY = clamp(P.yourY, 0, maxY);
+    // CPU paddle: beatable, a little faster for each point you win
+    const cap = P.h * Math.min(0.5 + 0.05 * P.you, 0.75) * dt;
+    const aim = (b.vx > 0 ? b.y : P.h / 2) - P.padH / 2, diff = aim - P.cpuY;
+    if (Math.abs(diff) > 6) P.cpuY += clamp(diff, -cap, cap);
+    P.cpuY = clamp(P.cpuY, 0, maxY);
+    // ball
+    if (P.serveIn > 0) { P.serveIn -= dt; return; }
+    const x0 = b.x, y0 = b.y;
+    b.x += b.vx * dt; b.y += b.vy * dt;
+    P.trail.push([b.x, b.y]); if (P.trail.length > 8) P.trail.shift();
+    if (b.y < BALL_R) { b.y = BALL_R; b.vy = Math.abs(b.vy); }
+    if (b.y > P.h - BALL_R) { b.y = P.h - BALL_R; b.vy = -Math.abs(b.vy); }
+    const hit = (padY, dir) => {
+      const rel = clamp((b.y - (padY + P.padH / 2)) / (P.padH / 2), -1, 1), ang = rel * 0.95;
+      P.speed = Math.min(P.speed * 1.06, base * 2.1);
+      b.vx = dir * P.speed * Math.cos(ang); b.vy = P.speed * Math.sin(ang);
+    };
+    const leftEdge = PAD_GAP + PAD_W, rightEdge = P.w - PAD_GAP - PAD_W;
+    // swept test: where was the ball when it reached the paddle face? (no tunnelling on slow frames)
+    const faceY = (edge, fromLeft) => {
+      const reached = fromLeft ? (x0 - BALL_R > PAD_GAP - PAD_W && b.x - BALL_R <= edge) : (x0 + BALL_R < P.w - PAD_GAP + PAD_W && b.x + BALL_R >= edge);
+      if (!reached) return null;
+      const span = fromLeft ? (x0 - b.x) : (b.x - x0), t = clamp((fromLeft ? (x0 - BALL_R - edge) : (edge - x0 - BALL_R)) / (span || 1), 0, 1);
+      return y0 + (b.y - y0) * t;
+    };
+    const yL = b.vx < 0 ? faceY(leftEdge, true) : null, yR = b.vx > 0 ? faceY(rightEdge, false) : null;
+    if (yL !== null && yL >= P.yourY - BALL_R && yL <= P.yourY + P.padH + BALL_R) {
+      b.x = leftEdge + BALL_R; b.y = yL; hit(P.yourY, 1); P.rally++;
+      if (P.rally > P.best) { P.best = P.rally; store.set("bestRally", String(P.best)); }
+      setPongHud();
+    } else if (yR !== null && yR >= P.cpuY - BALL_R && yR <= P.cpuY + P.padH + BALL_R) {
+      b.x = rightEdge - BALL_R; b.y = yR; hit(P.cpuY, -1);
+    }
+    // a point is scored when the ball leaves the court
+    if (b.x < -BALL_R || b.x > P.w + BALL_R) {
+      const youScored = b.x > P.w;
+      if (youScored) P.you++; else P.cpu++;
+      P.rally = 0; P.speed = base; setPongHud();
+      if (P.you >= WIN_SCORE || P.cpu >= WIN_SCORE) endPong(youScored);
+      else serve(youScored ? 1 : -1);
+    }
+  };
+  const drawPong = () => {
+    const { w, h } = P, px = isPixel(), b = P.ball;
+    pctx.clearRect(0, 0, w, h);
+    pctx.fillStyle = "#05050a"; pctx.fillRect(0, 0, w, h);
+    pctx.fillStyle = "rgba(255,255,255,.16)";
+    for (let y = 6; y < h; y += 20) pctx.fillRect(w / 2 - 1, y, 2, 10);
+    const pad = (x, y, rgb) => { pctx.fillStyle = `rgb(${rgb})`; if (px || !pctx.roundRect) pctx.fillRect(x, y, PAD_W, P.padH); else { pctx.beginPath(); pctx.roundRect(x, y, PAD_W, P.padH, 3); pctx.fill(); } };
+    pad(PAD_GAP, P.yourY, colors.a); pad(w - PAD_GAP - PAD_W, P.cpuY, colors.b);
+    P.trail.forEach(([tx, ty], i) => { pctx.fillStyle = `rgba(255,255,255,${(i / P.trail.length) * 0.22})`; pctx.fillRect(tx - 3, ty - 3, 6, 6); });
+    pctx.fillStyle = "#ffffff";
+    if (px) pctx.fillRect(Math.round(b.x - BALL_R), Math.round(b.y - BALL_R), BALL_R * 2, BALL_R * 2);
+    else { pctx.beginPath(); pctx.arc(b.x, b.y, BALL_R, 0, TAU); pctx.fill(); }
+  };
   /* ---------- Sizing, visibility and the master loop ---------- */
   const vis = new IntersectionObserver((entries) => entries.forEach((e) => {
-    if (e.target === laserCv) laser.visible = e.isIntersecting;
+    if (e.target === pongCv) P.visible = e.isIntersecting;
     if (e.target === gameCv) G.visible = e.isIntersecting;
   }));
-  vis.observe(laserCv); vis.observe(gameCv);
-  const sizeAll = () => { sizeWall(); sizeLaser(); sizeGame(); };
-  addEventListener("resize", () => { sizeAll(); if (reduceMotion) { drawWall(performance.now()); drawLaser(0.5); drawGame(); } });
+  vis.observe(pongCv); vis.observe(gameCv);
+  const sizeAll = () => { sizeWall(); sizePong(); sizeGame(); };
+  addEventListener("resize", () => { sizeAll(); if (reduceMotion) { drawWall(performance.now()); drawPong(); drawGame(); } });
   if (window.ResizeObserver) new ResizeObserver(() => sizeAll()).observe(stage);
   sizeAll();
   afterTheme = sizeAll;
@@ -956,14 +991,15 @@ html .swatch:hover { background: var(--hover-fill); color: var(--on-hover); }
   const frame = (now) => {
     const dt = Math.min((now - last) / 1000, 0.05); last = now;
     if (!document.hidden) {
-      if (!reduceMotion) { drawWall(now); if (laser.visible) drawLaser(dt); }
+      if (!reduceMotion) drawWall(now);
       if (G.visible || G.state === "playing") { updateGame(dt, now); drawGame(); }
+      if (P.visible || P.state === "playing") { updatePong(dt); drawPong(); }
     }
-    if (!reduceMotion || G.state === "playing") requestAnimationFrame(frame); else looping = false;
+    if (!reduceMotion || G.state === "playing" || P.state === "playing") requestAnimationFrame(frame); else looping = false;
   };
   const startLoop = () => { if (!looping) { looping = true; last = performance.now(); requestAnimationFrame(frame); } };
   startLoopRef = startLoop;
-  if (reduceMotion) { drawWall(performance.now()); drawLaser(0.5); G.now = 0; drawGame(); }
+  if (reduceMotion) { drawWall(performance.now()); drawPong(); G.now = 0; drawGame(); }
   else startLoop();
 })();
 
