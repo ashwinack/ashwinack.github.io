@@ -277,6 +277,7 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 .viewer-close:hover { background: var(--accent); color: var(--on-accent); }
 .viewer-close svg { width: 20px; height: 20px; }
 .viewer-stage { position: relative; aspect-ratio: 16 / 9; width: min(100%, max(320px, calc((100svh - 400px) * 16 / 9))); margin-inline: auto; border-radius: 16px; overflow: hidden; background: #000; box-shadow: 0 0 0 1px rgba(var(--accent2-rgb), .3), 0 0 60px -20px rgba(var(--accent2-rgb), .45); }
+.viewer-stage.portrait { aspect-ratio: 9 / 16; width: min(78%, max(200px, calc((100svh - 440px) * 9 / 16))); } /* clips filmed upright on a phone */
 .viewer-stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
 .viewer-note { color: var(--text-soft); font-size: .9375rem; min-height: 1.5em; }
 .viewer-list { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px; }
@@ -681,6 +682,7 @@ main { position: relative; z-index: 2; overflow-x: clip; }
       "title": "Interactive applications",
       "desc": "Applications integrated with IoT hardware, sensors and custom input devices for real-world interaction.",
       "clips": [
+        { "title": "3D virtual tour", "len": "1:14", "src": "media/virtual-tour.mp4", "poster": "media/virtual-tour.jpg", "note": "A building explorer: a touchscreen controls a 3D virtual tour of a city and its towers on a large wall display. This clip has sound." },
         { "title": "Hand-tracked particles", "len": "0:44", "src": "media/td-hand-particles.mp4", "poster": "media/td-hand-particles.jpg", "note": "Hand tracking from a webcam drives particle effects, built in TouchDesigner." },
         { "title": "Audio-reactive wave visuals", "len": "1:20", "src": "media/td-audio-wave.mp4", "poster": "media/td-audio-wave.jpg", "note": "A wave visual with colour, speed and audio-reactivity controls, built in TouchDesigner. This clip has sound." }
       ]
@@ -688,24 +690,34 @@ main { position: relative; z-index: 2; overflow-x: clip; }
     "games": {
       "title": "Arcade and casual games",
       "desc": "Engaging arcade and casual games with custom hardware integration.",
-      "clips": []
+      "clips": [
+        { "title": "Leap Motion slicing game", "portrait": true, "len": "0:36", "src": "media/leap-fruit.mp4", "poster": "media/leap-fruit.jpg", "note": "A Unity game played in mid-air: a Leap Motion hand tracker turns hand movement into slicing. This clip has sound." },
+        { "title": "Leap Motion photo puzzle", "len": "0:48", "src": "media/leap-puzzle.mp4", "poster": "media/leap-puzzle.jpg", "note": "Photo Puzzle: pinch to pick up jigsaw pieces and place them, using hand tracking from a Leap Motion. This clip has sound." }
+      ]
     },
     "sensors": {
       "title": "Sensor-based experiences",
       "desc": "Interactive environments built with motion sensors, pressure sensors and other IoT technologies.",
       "clips": [
+        { "title": "Gesture-controlled LED tower", "portrait": true, "len": "1:30", "src": "media/led-gesture.mp4", "poster": "media/led-gesture.jpg", "note": "Hand gestures control a tower of LED tubes, with sound. This clip is filmed upright on a phone." },
         { "title": "Hand-tracked particles", "len": "0:44", "src": "media/td-hand-particles.mp4", "poster": "media/td-hand-particles.jpg", "note": "Hand tracking from a webcam drives particle effects, built in TouchDesigner." }
       ]
     },
     "lidar": {
       "title": "LiDAR touch walls",
       "desc": "LiDAR-enabled systems that turn walls and surfaces into interactive touch displays using projectors.",
-      "clips": []
+      "clips": [
+        { "title": "Touch wall with audio", "len": "0:45", "src": "media/lidar-loom.mp4", "poster": "media/lidar-loom.jpg", "note": "Touch a large LED wall and the lines bend and change colour around the hand, with sound." },
+        { "title": "Fluid simulation wall", "len": "0:40", "src": "media/fluid-wall.mp4", "poster": "media/fluid-wall.jpg", "note": "The wall answers a touch with ripples from a fluid simulation, and logos appear under the hand. This clip has sound." },
+        { "title": "Interactive floor", "portrait": true, "len": "0:52", "src": "media/floor-lights.mp4", "poster": "media/floor-lights.jpg", "note": "Coloured light follows every step across the floor. This clip is filmed upright on a phone and has no sound." }
+      ]
     },
     "projection": {
       "title": "Projection mapping",
       "desc": "Interactive projection mapping with touch and gesture-based interaction, plus immersive installations produced for events and exhibitions.",
-      "clips": []
+      "clips": [
+        { "title": "Interactive floor", "portrait": true, "len": "0:52", "src": "media/floor-lights.mp4", "poster": "media/floor-lights.jpg", "note": "Coloured light follows every step across the floor. This clip is filmed upright on a phone and has no sound." }
+      ]
     },
     "laser": {
       "title": "Laser shows",
@@ -904,10 +916,11 @@ main { position: relative; z-index: 2; overflow-x: clip; }
   /* ---------- Video viewer: open any option and watch its videos ---------- */
   // The list of videos lives in <script id="videoData"> in index.html. Options with clips get a "Watch" button.
   const VIDEO_DATA = (() => { try { return JSON.parse($("#videoData").textContent); } catch (e) { return {}; } })();
-  const viewer = $("#viewer"), vVideo = $("#viewerVideo"), vList = $("#viewerList"), vNote = $("#viewerNote");
+  const viewer = $("#viewer"), vVideo = $("#viewerVideo"), vList = $("#viewerList"), vNote = $("#viewerNote"), vStage = $(".viewer-stage", viewer);
   const PLAY_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>';
   const loadClip = (clips, i, autoplay) => {
     const c = clips[i];
+    vStage.classList.toggle("portrait", !!c.portrait); // upright phone clips get a tall stage instead of black side bars
     vVideo.poster = c.poster || ""; vVideo.src = c.src; vNote.textContent = c.note || "";
     $$("button", vList).forEach((b, k) => b.setAttribute("aria-current", String(k === i)));
     if (autoplay) { const p = vVideo.play(); if (p) p.catch(() => {}); }
