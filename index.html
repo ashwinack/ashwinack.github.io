@@ -164,9 +164,9 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 .facts dd { color: var(--text); font-weight: 500; }
 
 /* work: interactive development, then hardware specialities */
-.dev-grid { display: grid; gap: 16px; align-items: stretch; }
-@media (min-width: 960px) { .dev-grid { grid-template-columns: 1.55fr 1fr; } }
-.reel { position: relative; overflow: hidden; isolation: isolate; aspect-ratio: 16 / 9; width: 100%; min-width: 0; margin: 0; border-radius: var(--r-card); background: #04050a; box-shadow: 0 30px 80px -40px rgba(var(--accent3-rgb), .6); }
+.dev-grid { display: grid; gap: 16px; }
+/* the trailer is shown whole at 16:9 (never cropped); the three options sit in a row under it */
+.reel { position: relative; overflow: hidden; isolation: isolate; aspect-ratio: 16 / 9; width: min(100%, calc((100svh - 140px) * 16 / 9)); min-width: 0; margin: 0 auto; border-radius: var(--r-card); background: #04050a; box-shadow: 0 30px 80px -40px rgba(var(--accent3-rgb), .6); }
 .reel::before { z-index: 2; }
 .reel > img, .reel > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .reel > img { object-position: 50% 16%; }
@@ -174,6 +174,11 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 .includes { display: grid; gap: 12px; grid-auto-rows: 1fr; }
 .includes li { display: flex; align-items: flex-start; gap: 18px; padding: 22px 24px; border-radius: var(--r-card); background: linear-gradient(180deg, rgba(var(--fg-rgb), .06), rgba(var(--fg-rgb), .02)); box-shadow: inset 0 0 0 1px var(--line); }
 .includes svg { flex: none; width: 36px; height: 36px; color: var(--accent2); filter: drop-shadow(0 0 12px rgba(var(--accent2-rgb), .6)); }
+@media (min-width: 840px) {
+  .includes { grid-template-columns: repeat(3, 1fr); }
+  .includes li { flex-direction: column; gap: 14px; }
+}
+.reel-note { margin: -4px 0 4px; text-align: center; color: var(--muted); font-size: .875rem; }
 .includes h3 { margin-bottom: 6px; }
 .includes p { color: var(--text-soft); font-size: .9375rem; }
 .sub-head { display: grid; gap: 10px; margin: clamp(56px, 8vw, 104px) 0 28px; }
@@ -472,10 +477,11 @@ main { position: relative; z-index: 2; overflow-x: clip; }
       </div>
 
       <div class="dev-grid">
-        <!-- The one video area: media/showreel.mp4 (both TouchDesigner recordings joined). Poster: media/showreel.jpg. -->
+        <!-- The trailer: media/showreel.mp4 = a short glimpse of every video (built by tools\make-trailer.ps1). Poster: media/showreel.jpg. -->
         <figure class="reel neon-edge rv" id="reel" data-video="media/showreel.mp4" data-poster="media/showreel.jpg">
-          <img class="reel-pic" src="media/showreel.jpg" width="1280" height="720" alt="Hand-tracking particle effects driven by a webcam, built in TouchDesigner" loading="lazy" decoding="async">
+          <img class="reel-pic" src="media/showreel.jpg" width="1280" height="720" alt="Trailer with a short glimpse of each project: LiDAR touch wall, hand tracking, Leap Motion games and more" loading="lazy" decoding="async">
         </figure>
+        <p class="reel-note rv">Trailer: a short glimpse of each project. Open any option below to watch its full videos.</p>
         <ul class="includes">
           <li class="rv" data-video-id="apps">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
@@ -906,7 +912,7 @@ main { position: relative; z-index: 2; overflow-x: clip; }
   if (reel && reel.dataset.video) {
     const still = $(".reel-pic", reel), v = document.createElement("video");
     v.className = "reel-video"; v.controls = true; v.playsInline = true; v.preload = "metadata";
-    v.setAttribute("playsinline", ""); v.setAttribute("aria-label", "Showreel of my interactive development work");
+    v.setAttribute("playsinline", ""); v.setAttribute("aria-label", "Trailer with a short glimpse of each interactive project");
     v.poster = reel.dataset.poster || (still && (still.currentSrc || still.src)) || "";
     v.src = reel.dataset.video;
     if (still) still.replaceWith(v); else reel.prepend(v);
