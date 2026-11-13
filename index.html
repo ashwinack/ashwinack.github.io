@@ -163,30 +163,41 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 .facts dt { font-size: .875rem; color: var(--muted); }
 .facts dd { color: var(--text); font-weight: 500; }
 
-/* work: bento */
-.bento { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 270px; gap: 16px; }
-.t-lidar { grid-column: span 2; grid-row: span 2; }
-.t-proj { grid-column: span 2; }
-.tile { position: relative; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; isolation: isolate; padding: 24px; border-radius: var(--r-card); background: var(--surface);
+/* work: interactive development, then hardware specialities */
+.dev-grid { display: grid; gap: 16px; align-items: stretch; }
+@media (min-width: 960px) { .dev-grid { grid-template-columns: 1.55fr 1fr; } }
+.reel { position: relative; overflow: hidden; isolation: isolate; aspect-ratio: 16 / 9; width: 100%; min-width: 0; margin: 0; border-radius: var(--r-card); background: #04050a; box-shadow: 0 30px 80px -40px rgba(var(--accent3-rgb), .6); }
+.reel::before { z-index: 2; }
+.reel > img, .reel > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.reel > img { object-position: 50% 16%; }
+.reel > video { background: #000; }
+.includes { display: grid; gap: 12px; grid-auto-rows: 1fr; }
+.includes li { display: flex; align-items: flex-start; gap: 18px; padding: 22px 24px; border-radius: var(--r-card); background: linear-gradient(180deg, rgba(var(--fg-rgb), .06), rgba(var(--fg-rgb), .02)); box-shadow: inset 0 0 0 1px var(--line); }
+.includes svg { flex: none; width: 36px; height: 36px; color: var(--accent2); filter: drop-shadow(0 0 12px rgba(var(--accent2-rgb), .6)); }
+.includes h3 { margin-bottom: 6px; }
+.includes p { color: var(--text-soft); font-size: .9375rem; }
+.sub-head { display: grid; gap: 10px; margin: clamp(56px, 8vw, 104px) 0 28px; }
+.sub-head h3 { font-size: clamp(1.75rem, 3.4vw, 2.75rem); line-height: 1.05; letter-spacing: -.04em; }
+.sub-head p { color: var(--text-soft); max-width: 46ch; }
+.spec-grid { display: grid; gap: 16px; }
+@media (min-width: 900px) { .spec-grid { grid-template-columns: repeat(3, 1fr); } }
+.tile { position: relative; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; isolation: isolate; min-height: 340px; padding: 24px; border-radius: var(--r-card); background: var(--surface);
   box-shadow: inset 0 0 0 1px var(--line); transition: box-shadow .3s, transform .3s var(--ease); outline-offset: 4px; }
+@media (min-width: 900px) { .tile { min-height: 420px; } }
 .tile::before { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity .3s;
   background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(var(--accent-rgb), .22), transparent 60%); }
 .tile:hover, .tile:focus-visible { transform: translateY(-4px); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .7), 0 24px 60px -24px rgba(var(--accent-rgb), .55), 0 0 40px -14px rgba(var(--accent2-rgb), .5); }
 .tile:hover::before, .tile:focus-visible::before { opacity: 1; }
 .tile > img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease); }
 .tile:hover > img { transform: scale(1.06); }
-.tile:has(> img)::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, rgba(var(--bg-rgb), .92) 4%, rgba(var(--bg-rgb), .35) 55%, rgba(var(--bg-rgb), .05)); }
+.tile > video { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s, transform .8s var(--ease); pointer-events: none; }
+.tile > video.on { opacity: 1; }
+.tile:hover > video { transform: scale(1.04); }
+.tile:has(> img, > video)::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, rgba(var(--bg-rgb), .92) 4%, rgba(var(--bg-rgb), .35) 55%, rgba(var(--bg-rgb), .05)); }
 .tile-body { position: relative; z-index: 3; display: grid; gap: 8px; }
-.tile h3 { font-size: clamp(1.25rem, 1.8vw, 1.625rem); line-height: 1.1; }
-.t-lidar h3 { font-size: clamp(1.75rem, 3vw, 2.75rem); letter-spacing: -.04em; }
-.tile p { color: var(--text-soft); font-size: .9375rem; max-width: 40ch; }
+.tile h3 { font-size: clamp(1.5rem, 2.2vw, 2rem); line-height: 1.1; letter-spacing: -.03em; }
+.tile p { color: var(--text-soft); font-size: .9375rem; max-width: 44ch; }
 .credit { position: absolute; top: 14px; right: 14px; z-index: 3; padding: 4px 10px; border-radius: var(--r-pill); font-size: .8125rem; color: var(--text-soft); background: rgba(var(--bg-rgb), .6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.tile-icon { position: absolute; top: 24px; left: 24px; z-index: 3; width: 44px; height: 44px; color: var(--text); filter: drop-shadow(0 0 14px rgba(var(--accent2-rgb), .7)); }
-.art-apps    { background: radial-gradient(120% 90% at 0% 0%, rgba(var(--accent-rgb), .55), transparent 60%), radial-gradient(90% 90% at 100% 100%, rgba(var(--accent3-rgb), .6), transparent 60%), var(--surface); }
-.art-sensors { background: radial-gradient(110% 90% at 100% 0%, rgba(var(--accent2-rgb), .55), transparent 60%), radial-gradient(90% 90% at 0% 100%, rgba(var(--accent3-rgb), .55), transparent 60%), var(--surface); }
-.art-install { background: radial-gradient(110% 90% at 0% 100%, rgba(var(--accent-rgb), .55), transparent 60%), radial-gradient(90% 90% at 100% 0%, rgba(var(--accent2-rgb), .5), transparent 60%), var(--surface); }
-.art-mapping { background: radial-gradient(110% 90% at 100% 100%, rgba(var(--accent3-rgb), .6), transparent 60%), radial-gradient(90% 90% at 0% 0%, rgba(var(--accent2-rgb), .5), transparent 60%), var(--surface); }
-
 /* play */
 .arcade-grid { display: grid; gap: 24px; }
 @media (min-width: 1000px) { .arcade-grid { grid-template-columns: 1fr 1fr; } }
@@ -297,10 +308,6 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 }
 
 /* ============ RESPONSIVE ============ */
-@media (max-width: 1000px) {
-  .bento { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 250px; }
-  .t-lidar { grid-row: span 1; }
-}
 @media (max-width: 760px) {
   .nav nav { display: none; }
   .pal-kbd { display: none; }
@@ -308,9 +315,6 @@ main { position: relative; z-index: 2; overflow-x: clip; }
   .pal-m { display: inline; }
   .hero { padding-top: 112px; padding-bottom: 150px; align-items: flex-start; }
   .hero-pic { width: 100%; opacity: .42; -webkit-mask-image: linear-gradient(0deg, transparent 0%, #000 55%); mask-image: linear-gradient(0deg, transparent 0%, #000 55%); object-position: 40% 50%; }
-  .bento { grid-template-columns: 1fr; grid-auto-rows: auto; }
-  .tile { min-height: 300px; }
-  .t-lidar, .t-proj { grid-column: span 1; }
   .bars { padding-left: 30px; }
   .bar::before { left: -26px; }
   .bars::before { left: 5px; }
@@ -339,7 +343,7 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 :root[data-style="pixel"] .hero h1 { font-size: clamp(1.4rem, 5.2vw, 4rem); line-height: 1.25; letter-spacing: 0; }
 :root[data-style="pixel"] h2 { font-size: clamp(1rem, 3vw, 2rem); max-width: 22ch; }
 :root[data-style="pixel"] .contact h2 { font-size: clamp(1.4rem, 5vw, 3.5rem); line-height: 1.25; letter-spacing: 0; }
-:root[data-style="pixel"] h3, :root[data-style="pixel"] .tile h3, :root[data-style="pixel"] .t-lidar h3 { font-size: .8rem; letter-spacing: 0; }
+:root[data-style="pixel"] h3, :root[data-style="pixel"] .tile h3 { font-size: .8rem; letter-spacing: 0; }
 :root[data-style="pixel"] .bar summary { font-size: .8rem; letter-spacing: 0; }
 :root[data-style="pixel"] .logo { font-size: .8rem; letter-spacing: 0; }
 :root[data-style="pixel"] .ticker-track { font-size: 1rem; letter-spacing: 0; }
@@ -426,14 +430,50 @@ main { position: relative; z-index: 2; overflow-x: clip; }
       </div>
     </section>
 
-    <!-- WORK -->
+    <!-- WORK: interactive development first, hardware specialities below -->
     <section class="section" id="work" data-reveal aria-labelledby="work-title">
       <div class="head">
-        <h2 id="work-title" class="rv">What I build</h2>
-        <p class="lead rv">Interactive systems where software meets projectors, sensors, lasers and custom hardware.</p>
+        <h2 id="work-title" class="rv">Interactive development</h2>
+        <p class="lead rv">I’m a Unity developer who builds interactive experiences: games, applications and installations that respond to people, sensors and custom hardware.</p>
       </div>
-      <ul class="bento">
-        <li class="tile t-lidar rv">
+
+      <div class="dev-grid">
+        <!-- The one video area. To show the video, set data-video="media/showreel.mp4" (and data-poster) on this figure. -->
+        <figure class="reel neon-edge rv" id="reel" data-video="">
+          <img class="reel-pic" src="assets/reel-arcade.jpg" width="1461" height="822" alt="A yellow vintage Pong arcade cabinet" loading="lazy" decoding="async">
+          <span class="credit" translate="no">Photo: Rob Boudon, CC BY 2.0</span>
+        </figure>
+        <ul class="includes">
+          <li class="rv">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+            <div>
+              <h3>Interactive applications</h3>
+              <p>Applications integrated with IoT hardware, sensors and custom input devices for real-world interaction.</p>
+            </div>
+          </li>
+          <li class="rv">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="3"/><path d="M7 10.5v4M5 12.5h4M16 11h.01M18.5 14h.01"/></svg>
+            <div>
+              <h3>Arcade and casual games</h3>
+              <p>Engaging arcade and casual games with custom hardware integration.</p>
+            </div>
+          </li>
+          <li class="rv">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2"/></svg>
+            <div>
+              <h3>Sensor-based experiences</h3>
+              <p>Interactive environments built with motion sensors, pressure sensors and other IoT technologies.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sub-head">
+        <h3 class="rv">Beyond the screen</h3>
+        <p class="rv">Where Unity meets LiDAR sensors, projectors and lasers.</p>
+      </div>
+      <ul class="spec-grid">
+        <li class="tile rv">
           <img src="assets/lidar-scan.jpg" width="1600" height="900" alt="A LiDAR scan of a city intersection drawn as glowing points" loading="lazy" decoding="async">
           <div class="tile-body">
             <h3>LiDAR touch walls</h3>
@@ -441,61 +481,24 @@ main { position: relative; z-index: 2; overflow-x: clip; }
           </div>
           <span class="credit" translate="no">Image: Daniel L. Lu, CC BY 4.0</span>
         </li>
-        <li class="tile t-proj rv">
+        <li class="tile rv">
           <img src="assets/projection-mapping.jpg" width="1600" height="900" alt="A video-mapped light projection covering the facade of a building at night" loading="lazy" decoding="async">
           <div class="tile-body">
-            <h3>Interactive projection mapping</h3>
-            <p>Projection mapping experiences with touch and gesture-based interaction.</p>
+            <h3>Projection mapping</h3>
+            <p>Interactive projection mapping with touch and gesture-based interaction, plus immersive installations produced for events and exhibitions.</p>
           </div>
           <span class="credit" translate="no">Photo: Miguel Discart, CC BY-SA 2.0</span>
         </li>
-        <li class="tile t-laser rv">
+        <li class="tile rv">
           <img src="assets/laser-show.jpg" width="1600" height="1067" alt="Blue and green laser beams fanning out above a waterfront skyline" loading="lazy" decoding="async">
           <div class="tile-body">
-            <h3>Laser show programming</h3>
-            <p>Laser effects designed and synchronized for live events and multimedia productions.</p>
+            <h3>Laser shows</h3>
+            <p>Laser effects designed and synchronized for live events, plus laser mapping and multimedia shows that sync laser, video and lighting.</p>
           </div>
           <span class="credit" translate="no">Photo: Erwin Soo, CC BY 2.0</span>
         </li>
-        <li class="tile t-arcade rv">
-          <img src="assets/arcade-cabinet.jpg" width="900" height="1231" alt="A yellow vintage Pong arcade cabinet" loading="lazy" decoding="async">
-          <div class="tile-body">
-            <h3>Arcade and casual games</h3>
-            <p>Engaging arcade and casual games with custom hardware integration.</p>
-          </div>
-          <span class="credit" translate="no">Photo: Rob Boudon, CC BY 2.0</span>
-        </li>
-        <li class="tile art art-apps rv">
-          <svg class="tile-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
-          <div class="tile-body">
-            <h3>Interactive applications</h3>
-            <p>Applications integrated with IoT hardware, sensors and custom input devices.</p>
-          </div>
-        </li>
-        <li class="tile art art-sensors rv">
-          <svg class="tile-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2"/></svg>
-          <div class="tile-body">
-            <h3>Sensor-based experiences</h3>
-            <p>Environments built with motion sensors, pressure sensors and other IoT technologies.</p>
-          </div>
-        </li>
-        <li class="tile art art-install rv">
-          <svg class="tile-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="12" height="8" rx="2"/><circle cx="9" cy="12" r="2"/><path d="m15 10 6-3v10l-6-3"/></svg>
-          <div class="tile-body">
-            <h3>Projection mapping installations</h3>
-            <p>Immersive installations produced for events and exhibitions.</p>
-          </div>
-        </li>
-        <li class="tile art art-mapping rv">
-          <svg class="tile-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-9M12 12 5 4M12 12l7-8M12 12 3 10M12 12l9-2"/><circle cx="12" cy="21" r="1"/></svg>
-          <div class="tile-body">
-            <h3>Laser mapping and multimedia shows</h3>
-            <p>Synchronized laser, video and lighting systems for large-scale presentations.</p>
-          </div>
-        </li>
       </ul>
     </section>
-
     <!-- PLAY -->
     <section class="section" id="play" data-reveal aria-labelledby="play-title">
       <div class="head">
@@ -770,6 +773,45 @@ main { position: relative; z-index: 2; overflow-x: clip; }
     t.style.setProperty("--mx", `${e.clientX - r.left}px`); t.style.setProperty("--my", `${e.clientY - r.top}px`);
   }));
 
+  /* ---------- Tile videos: play on hover, or while in view on touch screens ---------- */
+  // To give a tile a video, add data-video="media/name.mp4" to its <li class="tile">.
+  const videoTiles = [];
+  $$(".tile[data-video]").forEach((tile) => {
+    const v = document.createElement("video");
+    v.className = "tile-video"; v.muted = true; v.loop = true; v.playsInline = true; v.preload = "none";
+    v.setAttribute("muted", ""); v.setAttribute("playsinline", ""); v.setAttribute("aria-hidden", "true"); v.tabIndex = -1;
+    v.dataset.src = tile.dataset.video;
+    v.addEventListener("playing", () => v.classList.add("on"));
+    tile.prepend(v); tile._v = v; videoTiles.push(tile);
+  });
+  const playTile = (v) => {
+    if (!v.src) v.src = v.dataset.src;
+    if (reduceMotion) return; // people who ask for less motion keep the still picture
+    const p = v.play(); if (p) p.catch(() => {});
+  };
+  if (finePointer) {
+    videoTiles.forEach((tile) => {
+      tile.addEventListener("pointerenter", () => playTile(tile._v));
+      tile.addEventListener("pointerleave", () => tile._v.pause());
+    });
+  } else if (videoTiles.length) {
+    const vio = new IntersectionObserver((entries) => entries.forEach((e) => (e.isIntersecting ? playTile(e.target._v) : e.target._v.pause())), { threshold: 0.6 });
+    videoTiles.forEach((tile) => vio.observe(tile));
+  }
+
+  /* ---------- The showreel: one video area under "Interactive development" ---------- */
+  // Until a video is set (data-video on #reel) the stand-in picture stays. With a video it becomes a real player.
+  const reel = $("#reel");
+  if (reel && reel.dataset.video) {
+    const still = $(".reel-pic", reel), v = document.createElement("video");
+    v.className = "reel-video"; v.controls = true; v.playsInline = true; v.preload = "metadata";
+    v.setAttribute("playsinline", ""); v.setAttribute("aria-label", "Showreel of my interactive development work");
+    v.poster = reel.dataset.poster || (still && (still.currentSrc || still.src)) || "";
+    v.src = reel.dataset.video;
+    if (still) still.replaceWith(v); else reel.prepend(v);
+    const credit = $(".credit", reel); if (credit && reel.dataset.poster) credit.remove(); // the stand-in picture and its credit go together
+  }
+
   /* ---------- Copy email ---------- */
   const copyEmail = async () => {
     const email = $("#copyEmail").dataset.email;
@@ -784,7 +826,7 @@ main { position: relative; z-index: 2; overflow-x: clip; }
   const playGame = (id) => { go(`#${id}`); setTimeout(() => $(`#${id === "game" ? "gameStart" : "pongStart"}`).focus({ preventScroll: true }), 650); };
   const ACTIONS = [
     { label: "Go to About", hint: "Section", run: () => go("#about") },
-    { label: "Go to What I build", hint: "Section", run: () => go("#work") },
+    { label: "Go to Work", hint: "Section", run: () => go("#work") },
     { label: "Go to Play", hint: "Section", run: () => go("#play") },
     { label: "Go to Experience", hint: "Section", run: () => go("#experience") },
     { label: "Go to Contact", hint: "Section", run: () => go("#contact") },
