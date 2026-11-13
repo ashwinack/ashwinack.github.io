@@ -256,6 +256,38 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 .credits { margin-top: 24px; max-width: 70ch; font-size: .875rem; line-height: 1.6; color: var(--muted); }
 .credits a { text-decoration: underline; text-underline-offset: 3px; }
 
+/* ============ VIDEO VIEWER ============ */
+.has-videos { cursor: pointer; }
+.includes li.has-videos { transition: box-shadow .3s, transform .3s var(--ease); }
+.includes li.has-videos:hover { transform: translateY(-3px); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .65), 0 20px 50px -24px rgba(var(--accent-rgb), .5); }
+.watch-btn { display: inline-flex; align-items: center; gap: 8px; width: fit-content; margin-top: 14px; padding: 9px 16px 9px 12px; border: 0; border-radius: var(--r-pill); cursor: pointer; font: inherit; font-size: .875rem; font-weight: 600; color: var(--text);
+  background: rgba(var(--fg-rgb), .1); box-shadow: inset 0 0 0 1px var(--line-strong); touch-action: manipulation; transition: background-color .2s, box-shadow .2s, color .2s; }
+.watch-btn svg { width: 18px; height: 18px; color: var(--accent2); }
+.watch-btn:hover, .has-videos:hover .watch-btn { background: var(--grad); color: var(--on-accent); box-shadow: 0 0 28px -6px rgba(var(--accent-rgb), .7); }
+.watch-btn:hover svg, .has-videos:hover .watch-btn svg { color: var(--on-accent); }
+
+.viewer { width: min(1060px, calc(100vw - 24px)); max-height: calc(100svh - 24px); margin: auto; padding: 0; border: 0; border-radius: 24px; overflow: auto; overscroll-behavior: contain; background: var(--surface-2); color: var(--text);
+  box-shadow: 0 0 0 1px var(--line-strong), 0 40px 120px -20px rgba(0, 0, 0, .85), 0 0 90px -20px rgba(var(--accent-rgb), .45); }
+.viewer::backdrop { background: rgba(3, 4, 8, .78); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.viewer-box { display: grid; gap: 16px; padding: clamp(16px, 2.6vw, 28px); }
+.viewer-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.viewer-title { font-size: clamp(1.5rem, 3vw, 2.25rem); line-height: 1.05; letter-spacing: -.04em; max-width: none; margin: 0 0 6px; }
+.viewer-desc { color: var(--text-soft); font-size: .9375rem; max-width: 62ch; }
+.viewer-close { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; cursor: pointer; color: var(--text); background: rgba(var(--fg-rgb), .1); box-shadow: inset 0 0 0 1px var(--line-strong); touch-action: manipulation; transition: background-color .2s, color .2s; }
+.viewer-close:hover { background: var(--accent); color: var(--on-accent); }
+.viewer-close svg { width: 20px; height: 20px; }
+.viewer-stage { position: relative; aspect-ratio: 16 / 9; width: min(100%, max(320px, calc((100svh - 400px) * 16 / 9))); margin-inline: auto; border-radius: 16px; overflow: hidden; background: #000; box-shadow: 0 0 0 1px rgba(var(--accent2-rgb), .3), 0 0 60px -20px rgba(var(--accent2-rgb), .45); }
+.viewer-stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.viewer-note { color: var(--text-soft); font-size: .9375rem; min-height: 1.5em; }
+.viewer-list { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px; }
+.viewer-list[hidden] { display: none; }
+.viewer-list li { flex: 0 0 min(240px, 70%); }
+.viewer-list button { display: grid; gap: 8px; width: 100%; padding: 8px; border: 0; border-radius: 14px; cursor: pointer; text-align: left; font: inherit; color: var(--text-soft); background: rgba(var(--fg-rgb), .06); box-shadow: inset 0 0 0 1px var(--line); touch-action: manipulation; transition: background-color .2s, box-shadow .2s, color .2s; }
+.viewer-list button:hover { background: rgba(var(--fg-rgb), .12); color: var(--text); }
+.viewer-list button[aria-current="true"] { color: var(--text); background: rgba(var(--accent-rgb), .16); box-shadow: inset 0 0 0 2px var(--accent); }
+.viewer-list img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; display: block; }
+.viewer-list .vl-title { font-weight: 600; font-size: .9375rem; line-height: 1.25; padding: 0 4px; }
+.viewer-list small { padding: 0 4px 2px; font-size: .8125rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 /* ============ COMMAND MENU ============ */
 .palette { width: min(640px, calc(100vw - 32px)); margin: 12vh auto auto; padding: 0; border: 0; border-radius: 20px; background: var(--surface-2); color: var(--text); overflow: hidden;
   box-shadow: 0 0 0 1px var(--line-strong), 0 40px 100px -20px rgba(0, 0, 0, .8), 0 0 80px -20px rgba(var(--accent-rgb), .5); }
@@ -350,6 +382,7 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 :root[data-style="pixel"] .wordmark { font-size: 10vw; letter-spacing: 0; line-height: 1.2; }
 :root[data-style="pixel"] .game-overlay h4 { font-size: 1.1rem; letter-spacing: 0; }
 :root[data-style="pixel"] .orb { filter: blur(60px); }
+:root[data-style="pixel"] .viewer, :root[data-style="pixel"] .viewer-stage, :root[data-style="pixel"] .viewer-list button, :root[data-style="pixel"] .viewer-list img, :root[data-style="pixel"] .viewer-close, :root[data-style="pixel"] .watch-btn { border-radius: 0; }
 :root[data-style="pixel"] .logo-mark, :root[data-style="pixel"] .badge-dot, :root[data-style="pixel"] .swatch i, :root[data-style="pixel"] .themer-btn, :root[data-style="pixel"] .bar summary::after, :root[data-style="pixel"] .bar::before { border-radius: 0; }
 :root[data-style="pixel"] .cv, :root[data-style="pixel"] .tile > img, :root[data-style="pixel"] .hero-pic { image-rendering: pixelated; }
 :root[data-style="pixel"]::after { content: ""; position: fixed; inset: 0; z-index: 99; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .28) 0 1px, transparent 1px 3px); }
@@ -443,21 +476,21 @@ main { position: relative; z-index: 2; overflow-x: clip; }
           <img class="reel-pic" src="media/showreel.jpg" width="1280" height="720" alt="Hand-tracking particle effects driven by a webcam, built in TouchDesigner" loading="lazy" decoding="async">
         </figure>
         <ul class="includes">
-          <li class="rv">
+          <li class="rv" data-video-id="apps">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
             <div>
               <h3>Interactive applications</h3>
               <p>Applications integrated with IoT hardware, sensors and custom input devices for real-world interaction.</p>
             </div>
           </li>
-          <li class="rv">
+          <li class="rv" data-video-id="games">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="3"/><path d="M7 10.5v4M5 12.5h4M16 11h.01M18.5 14h.01"/></svg>
             <div>
               <h3>Arcade and casual games</h3>
               <p>Engaging arcade and casual games with custom hardware integration.</p>
             </div>
           </li>
-          <li class="rv">
+          <li class="rv" data-video-id="sensors">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2"/></svg>
             <div>
               <h3>Sensor-based experiences</h3>
@@ -472,7 +505,7 @@ main { position: relative; z-index: 2; overflow-x: clip; }
         <p class="rv">Where Unity meets LiDAR sensors, projectors and lasers.</p>
       </div>
       <ul class="spec-grid">
-        <li class="tile rv">
+        <li class="tile rv" data-video-id="lidar">
           <img src="assets/lidar-scan.jpg" width="1600" height="900" alt="A LiDAR scan of a city intersection drawn as glowing points" loading="lazy" decoding="async">
           <div class="tile-body">
             <h3>LiDAR touch walls</h3>
@@ -480,7 +513,7 @@ main { position: relative; z-index: 2; overflow-x: clip; }
           </div>
           <span class="credit" translate="no">Image: Daniel L. Lu, CC BY 4.0</span>
         </li>
-        <li class="tile rv">
+        <li class="tile rv" data-video-id="projection">
           <img src="assets/projection-mapping.jpg" width="1600" height="900" alt="A video-mapped light projection covering the facade of a building at night" loading="lazy" decoding="async">
           <div class="tile-body">
             <h3>Projection mapping</h3>
@@ -488,7 +521,7 @@ main { position: relative; z-index: 2; overflow-x: clip; }
           </div>
           <span class="credit" translate="no">Photo: Miguel Discart, CC BY-SA 2.0</span>
         </li>
-        <li class="tile rv">
+        <li class="tile rv" data-video-id="laser">
           <img src="assets/laser-show.jpg" width="1600" height="1067" alt="Blue and green laser beams fanning out above a waterfront skyline" loading="lazy" decoding="async">
           <div class="tile-body">
             <h3>Laser shows</h3>
@@ -641,6 +674,64 @@ main { position: relative; z-index: 2; overflow-x: clip; }
     </div>
   </dialog>
 
+  <!-- Which videos open from which option. Add a clip here and its option gets a "Watch" button automatically. -->
+  <script type="application/json" id="videoData">
+  {
+    "apps": {
+      "title": "Interactive applications",
+      "desc": "Applications integrated with IoT hardware, sensors and custom input devices for real-world interaction.",
+      "clips": [
+        { "title": "Hand-tracked particles", "len": "0:44", "src": "media/td-hand-particles.mp4", "poster": "media/td-hand-particles.jpg", "note": "Hand tracking from a webcam drives particle effects, built in TouchDesigner." },
+        { "title": "Audio-reactive wave visuals", "len": "1:20", "src": "media/td-audio-wave.mp4", "poster": "media/td-audio-wave.jpg", "note": "A wave visual with colour, speed and audio-reactivity controls, built in TouchDesigner. This clip has sound." }
+      ]
+    },
+    "games": {
+      "title": "Arcade and casual games",
+      "desc": "Engaging arcade and casual games with custom hardware integration.",
+      "clips": []
+    },
+    "sensors": {
+      "title": "Sensor-based experiences",
+      "desc": "Interactive environments built with motion sensors, pressure sensors and other IoT technologies.",
+      "clips": [
+        { "title": "Hand-tracked particles", "len": "0:44", "src": "media/td-hand-particles.mp4", "poster": "media/td-hand-particles.jpg", "note": "Hand tracking from a webcam drives particle effects, built in TouchDesigner." }
+      ]
+    },
+    "lidar": {
+      "title": "LiDAR touch walls",
+      "desc": "LiDAR-enabled systems that turn walls and surfaces into interactive touch displays using projectors.",
+      "clips": []
+    },
+    "projection": {
+      "title": "Projection mapping",
+      "desc": "Interactive projection mapping with touch and gesture-based interaction, plus immersive installations produced for events and exhibitions.",
+      "clips": []
+    },
+    "laser": {
+      "title": "Laser shows",
+      "desc": "Laser effects designed and synchronized for live events, plus laser mapping and multimedia shows that sync laser, video and lighting.",
+      "clips": []
+    }
+  }
+  </script>
+
+  <!-- Video viewer: opens from any option that has videos -->
+  <dialog class="viewer" id="viewer" aria-labelledby="viewerTitle">
+    <div class="viewer-box">
+      <header class="viewer-head">
+        <div>
+          <h2 id="viewerTitle" class="viewer-title"></h2>
+          <p id="viewerDesc" class="viewer-desc"></p>
+        </div>
+        <button type="button" class="viewer-close" id="viewerClose" aria-label="Close video viewer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </header>
+      <div class="viewer-stage"><video id="viewerVideo" controls playsinline preload="none"></video></div>
+      <p class="viewer-note" id="viewerNote"></p>
+      <ul class="viewer-list" id="viewerList" aria-label="Videos in this section"></ul>
+    </div>
+  </dialog>
   <script>
 (() => {
   const root = document.documentElement;
@@ -810,6 +901,42 @@ main { position: relative; z-index: 2; overflow-x: clip; }
     const credit = $(".credit", reel); if (credit && reel.dataset.poster) credit.remove(); // the stand-in picture and its credit go together
   }
 
+  /* ---------- Video viewer: open any option and watch its videos ---------- */
+  // The list of videos lives in <script id="videoData"> in index.html. Options with clips get a "Watch" button.
+  const VIDEO_DATA = (() => { try { return JSON.parse($("#videoData").textContent); } catch (e) { return {}; } })();
+  const viewer = $("#viewer"), vVideo = $("#viewerVideo"), vList = $("#viewerList"), vNote = $("#viewerNote");
+  const PLAY_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>';
+  const loadClip = (clips, i, autoplay) => {
+    const c = clips[i];
+    vVideo.poster = c.poster || ""; vVideo.src = c.src; vNote.textContent = c.note || "";
+    $$("button", vList).forEach((b, k) => b.setAttribute("aria-current", String(k === i)));
+    if (autoplay) { const p = vVideo.play(); if (p) p.catch(() => {}); }
+  };
+  const openViewer = (id) => {
+    const d = VIDEO_DATA[id];
+    if (!d || !d.clips || !d.clips.length) return;
+    $$("video").forEach((v) => { if (v !== vVideo) v.pause(); }); // never two videos at once
+    $("#viewerTitle").textContent = d.title; $("#viewerDesc").textContent = d.desc;
+    vList.innerHTML = d.clips.map((c, i) => `<li><button type="button" data-i="${i}"><img src="${c.poster}" alt="" width="320" height="180" loading="lazy"><span class="vl-title">${c.title}</span><small>${c.len}</small></button></li>`).join("");
+    vList.hidden = d.clips.length < 2;
+    vList.onclick = (e) => { const b = e.target.closest("button"); if (b) loadClip(d.clips, +b.dataset.i, true); };
+    loadClip(d.clips, 0, true);
+    viewer.showModal();
+  };
+  viewer.addEventListener("close", () => { vVideo.pause(); vVideo.removeAttribute("src"); vVideo.load(); }); // stop the download too
+  viewer.addEventListener("click", (e) => { if (e.target === viewer) viewer.close(); });  // click outside the box
+  $("#viewerClose").addEventListener("click", () => viewer.close());
+  $$("[data-video-id]").forEach((el) => {
+    const id = el.dataset.videoId, d = VIDEO_DATA[id];
+    if (!d || !d.clips || !d.clips.length) return;
+    const n = d.clips.length, b = document.createElement("button");
+    b.type = "button"; b.className = "watch-btn"; b.setAttribute("aria-haspopup", "dialog");
+    b.innerHTML = `${PLAY_ICON}<span>Watch ${n > 1 ? `${n} videos` : "video"}</span>`;
+    (el.querySelector(".tile-body") || el.querySelector("div") || el).appendChild(b);
+    el.classList.add("has-videos");
+    el.addEventListener("click", () => openViewer(id)); // the whole card is clickable; the button is the keyboard route
+  });
+  const videoActions = Object.entries(VIDEO_DATA).filter(([, d]) => d.clips && d.clips.length).map(([id, d]) => ({ label: `Watch videos: ${d.title}`, hint: "Videos", run: () => openViewer(id) }));
   /* ---------- Copy email ---------- */
   const copyEmail = async () => {
     const email = $("#copyEmail").dataset.email;
@@ -835,6 +962,7 @@ main { position: relative; z-index: 2; overflow-x: clip; }
     { label: "Open GitHub profile", hint: "Link", run: () => window.open("https://github.com/ashwinack", "_blank", "noopener") },
     { label: "Switch to the next color theme", hint: "Theme", run: cycleTheme },
     { label: "Back to top", hint: "Section", run: () => go("#top") },
+    ...videoActions,
   ];
   let shown = ACTIONS, sel = 0;
   const renderPal = () => {
