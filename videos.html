@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>All videos, Ashwin CK</title>
+  <meta name="description" content="Every project video by Ashwin CK: LiDAR touch walls, projection rooms, laser shows, Leap Motion games, kiosks and sensor installations. Filter by category and technology.">
+  <meta name="theme-color" content="#0f0e0c">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230f0e0c'/%3E%3Ccircle cx='50' cy='50' r='18' fill='%23e0672f'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..500&family=Instrument+Sans:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=27">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <canvas class="field" id="field" aria-hidden="true"></canvas>
+
+  <header class="top">
+    <div class="wrap top-row">
+      <a class="brand" href="./" translate="no" data-magnetic>Ashwin CK</a>
+      <button type="button" class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="siteNav">Menu</button>
+      <nav id="siteNav" aria-label="Primary">
+        <a href="videos.html" data-split data-magnetic aria-current="page">Work</a>
+        <a href="./#about" data-split data-magnetic>About</a>
+        <a href="./#skills" data-split data-magnetic>Skills</a>
+        <a href="./#contact" data-split data-magnetic>Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Every project video. Filled from projects.js; each row opens the video in the viewer on this page. -->
+    <section class="section wrap videos-top" aria-labelledby="videos-title">
+      <header class="head">
+        <span class="num mono" data-depth="10">All</span>
+        <h1 id="videos-title" class="page-title">All videos</h1>
+        <p id="archiveCount" aria-live="polite"></p>
+      </header>
+      <div class="filters">
+        <div class="filter-row" role="group" aria-labelledby="f-cat">
+          <span class="filter-label mono" id="f-cat">Category</span>
+          <div class="chips" id="catChips"></div>
+        </div>
+        <div class="filter-row" role="group" aria-labelledby="f-tech">
+          <span class="filter-label mono" id="f-tech">Technology</span>
+          <div class="chips" id="techChips"></div>
+        </div>
+      </div>
+      <ol class="rows" id="archiveGrid"></ol>
+      <p class="empty" id="archiveEmpty" hidden>No videos match both filters. <button type="button" class="link-btn" id="clearFilters">Clear filters</button></p>
+    </section>
+  </main>
+
+  <footer class="foot wrap mono">
+    <span>© <span id="year"></span> <span translate="no">Ashwin CK</span></span>
+    <a href="./">Back to the main page</a>
+  </footer>
+
+  <dialog class="viewer" id="viewer" aria-labelledby="viewerTitle">
+    <div class="viewer-bar"><span class="mono" id="viewerCount"></span><span class="mono viewer-hint">Arrow keys: previous, next</span><button type="button" class="viewer-close mono" id="viewerClose">Close</button></div>
+    <div class="viewer-body project" id="viewerBody"></div>
+  </dialog>
+
+  <script src="projects.js?v=27"></script>
+  <script src="script.js?v=27"></script>
+</body>
+</html>
