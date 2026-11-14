@@ -142,50 +142,164 @@
     setTimeout(() => $$(".reveal").forEach((el) => el.classList.add("in")), 4000); // never leave content hidden
   }
 
-  /* ---------- Hero field: a grid of points that reads the pointer like a tracking system ---------- */
+  /* ---------- Blob drawing, in the look of a video blob-tracking overlay ---------- */
+  // Thin white boxes with a small value in the middle, and hairlines running through the boxes and out to the edges.
+  const lineThrough = (ctx, a, b, W, H) => {
+    const dx = b.x - a.x, dy = b.y - a.y; if (!dx && !dy) return;
+    let t0 = -1e9, t1 = 1e9;
+    for (const [p, d, lim] of [[a.x, dx, W], [a.y, dy, H]]) {
+      if (d) { const u = (0 - p) / d, w = (lim - p) / d; t0 = Math.max(t0, Math.min(u, w)); t1 = Math.min(t1, Math.max(u, w)); }
+      else if (p < 0 || p > lim) return;
+    }
+    ctx.moveTo(a.x + dx * t0, a.y + dy * t0); ctx.lineTo(a.x + dx * t1, a.y + dy * t1);
+  };
+  const drawBlobs = (ctx, blobs, W, H, minBox, fontPx, fan = 2) => {
+    const list = [...blobs].sort((p, q) => p.x - q.x);
+    ctx.lineWidth = 1; ctx.strokeStyle = "rgba(255, 255, 255, 0.72)"; ctx.beginPath();
+    for (let i = 0; i < list.length; i++) for (let k = 1; k <= fan; k++) if (list[i + k]) lineThrough(ctx, list[i], list[i + k], W, H);
+    ctx.stroke();
+    ctx.font = `${fontPx}px 'JetBrains Mono', monospace`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    for (const b of blobs) {
+      const w = Math.round(Math.max(minBox, b.x1 - b.x0)), h = Math.round(Math.max(minBox, b.y1 - b.y0));
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.95)"; ctx.strokeRect(Math.round(b.x - w / 2) + 0.5, Math.round(b.y - h / 2) + 0.5, w, h);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.95)"; ctx.fillText(b.val.toFixed(4), b.x, b.y);
+    }
+  };
+  /* ---------- Page-wide field: a dot grid plus TouchDesigner-style blob tracking ---------- */
+  // Every pointer (mouse or finger) leaves heat in a coarse grid. Cells above a threshold form blobs; each blob is found by
+  // flood fill and tracked from frame to frame, then drawn with a bracket, centroid cross, id, size and speed, like a Blob Track TOP.
+  // Mouse and touch both work (each finger is its own blob). With "reduce motion" the field stays a still dot grid.
   const field = $("#field"), readout = $("#readout");
-  let drawField = null;
   if (field) {
-    const ctx = field.getContext("2d"), GAP = 30, REACH = 190;
-    let W = 0, H = 0, pts = [];
-    const trail = [];
+    const ctx = field.getContext("2d"), coarse = !finePointer;
+    const GAP = 30, CELL = coarse ? 14 : 12, REACH = 190, THRESH = 0.42, R = coarse ? 4 : 3.2;
+    let W = 0, H = 0, pts = [], cols = 0, rows = 0, heat = new Float32Array(0), seen = new Int32Array(0), stamp = 0;
+    const inputs = new Map(); // pointer id -> { x, y }
+    let blobs = [], nextId = 1, live = 2, tick = 0;
+
     const size = () => {
-      const dpr = Math.min(devicePixelRatio || 1, 2);
+      const dpr = coarse ? 1 : Math.min(devicePixelRatio || 1, 2);
       W = innerWidth; H = innerHeight; field.width = Math.round(W * dpr); field.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       pts = []; for (let y = GAP / 2; y < H; y += GAP) for (let x = GAP / 2; x < W; x += GAP) pts.push([x, y]);
+      cols = Math.ceil(W / CELL); rows = Math.ceil(H / CELL); heat = new Float32Array(cols * rows); seen = new Int32Array(cols * rows);
+      live = 2;
     };
-    drawField = (mx, my, inside) => {
-      ctx.clearRect(0, 0, W, H);
-      for (const [x, y] of pts) {
-        let px = x, py = y, k = 0;
-        if (inside) {
-          const dx = x - mx, dy = y - my, d = Math.hypot(dx, dy);
-          if (d < REACH) { k = 1 - d / REACH; const push = k * k * 14 / (d || 1); px += dx * push; py += dy * push; }
+    const deposit = (x, y, amount, r) => {
+      const cx = x / CELL, cy = y / CELL;
+      for (let j = Math.max(0, Math.floor(cy - r)); j <= Math.min(rows - 1, Math.ceil(cy + r)); j++)
+        for (let i = Math.max(0, Math.floor(cx - r)); i <= Math.min(cols - 1, Math.ceil(cx + r)); i++) {
+          const d = Math.hypot(i + 0.5 - cx, j + 0.5 - cy);
+          if (d < r) { const k = j * cols + i; heat[k] = Math.min(1.6, heat[k] + (1 - d / r) * amount); }
         }
-        const s = 1.5 + k * 2.5;
-        ctx.fillStyle = k > 0.02 ? `rgba(111, 179, 168, ${0.2 + k * 0.8})` : "rgba(236, 230, 218, 0.22)";
-        ctx.fillRect(px - s / 2, py - s / 2, s, s);
-      }
-      if (!inside) return;
-      // crosshair and bracket: what the tracker has locked on to
-      ctx.strokeStyle = "rgba(111, 179, 168, 0.22)"; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(0, my + 0.5); ctx.lineTo(W, my + 0.5); ctx.moveTo(mx + 0.5, 0); ctx.lineTo(mx + 0.5, H); ctx.stroke();
-      const b = 26, c = 7; ctx.strokeStyle = "rgba(111, 179, 168, 0.85)";
-      ctx.beginPath();
-      [[-1, -1], [1, -1], [1, 1], [-1, 1]].forEach(([sx, sy]) => { const X = mx + sx * b, Y = my + sy * b; ctx.moveTo(X - sx * c, Y); ctx.lineTo(X, Y); ctx.lineTo(X, Y - sy * c); });
-      ctx.stroke();
-      // the recent path of the pointer
-      for (let t = 1; t < trail.length; t++) {
-        ctx.strokeStyle = `rgba(224, 103, 47, ${(t / trail.length) * 0.7})`;
-        ctx.beginPath(); ctx.moveTo(trail[t - 1][0], trail[t - 1][1]); ctx.lineTo(trail[t][0], trail[t][1]); ctx.stroke();
-      }
     };
-    drawField.trail = trail;
-    size(); drawField(0, 0, false);
-    addEventListener("resize", () => { size(); drawField(0, 0, false); });
+    const stroke = (inp, x, y) => { // fill the path between two pointer samples so fast moves leave a solid trail
+      const dx = x - inp.x, dy = y - inp.y, n = Math.max(1, Math.ceil(Math.hypot(dx, dy) / (CELL * 0.6)));
+      for (let s = 1; s <= n; s++) deposit(inp.x + (dx * s) / n, inp.y + (dy * s) / n, 0.55, R);
+      inp.x = x; inp.y = y;
+    };
+
+    const find = () => { // threshold, flood fill into blobs, then keep ids stable by matching to the previous frame
+      stamp++; const found = [];
+      for (let s = 0; s < heat.length; s++) {
+        if (heat[s] < THRESH || seen[s] === stamp) continue;
+        const stack = [s]; seen[s] = stamp;
+        let n = 0, i0 = cols, i1 = 0, j0 = rows, j1 = 0, sw = 0, sx = 0, sy = 0;
+        while (stack.length) {
+          const k = stack.pop(), i = k % cols, j = (k / cols) | 0, w = heat[k];
+          n++; sw += w; sx += (i + 0.5) * w; sy += (j + 0.5) * w;
+          if (i < i0) i0 = i; if (i > i1) i1 = i; if (j < j0) j0 = j; if (j > j1) j1 = j;
+          if (i > 0 && heat[k - 1] >= THRESH && seen[k - 1] !== stamp) { seen[k - 1] = stamp; stack.push(k - 1); }
+          if (i < cols - 1 && heat[k + 1] >= THRESH && seen[k + 1] !== stamp) { seen[k + 1] = stamp; stack.push(k + 1); }
+          if (j > 0 && heat[k - cols] >= THRESH && seen[k - cols] !== stamp) { seen[k - cols] = stamp; stack.push(k - cols); }
+          if (j < rows - 1 && heat[k + cols] >= THRESH && seen[k + cols] !== stamp) { seen[k + cols] = stamp; stack.push(k + cols); }
+        }
+        if (n >= 3) found.push({ x: (sx / sw) * CELL, y: (sy / sw) * CELL, x0: i0 * CELL, y0: j0 * CELL, x1: (i1 + 1) * CELL, y1: (j1 + 1) * CELL, area: n });
+      }
+      const prev = blobs;
+      blobs = found.map((b) => {
+        let best = -1, bd = 140;
+        prev.forEach((p, i) => { if (!p.used) { const d = Math.hypot(p.x - b.x, p.y - b.y); if (d < bd) { bd = d; best = i; } } });
+        if (best >= 0) { const p = prev[best]; p.used = true; b.id = p.id; b.v = p.v * 0.8 + bd * 60 * 0.2; }
+        else { b.id = nextId++; b.v = 0; }
+        b.val = 1 + b.area / 40;
+        return b;
+      });
+    };
+
+    const pad2 = (n) => String(n).padStart(2, "0");
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      const near = [...inputs.values()];
+      for (const [x, y] of pts) { // the dot grid, pushed aside around every pointer
+        let px = x, py = y, k = 0;
+        for (const inp of near) {
+          const dx = x - inp.x, dy = y - inp.y, d = Math.hypot(dx, dy);
+          if (d < REACH) { const kk = 1 - d / REACH; if (kk > k) k = kk; const push = (kk * kk * 14) / (d || 1); px += dx * push; py += dy * push; }
+        }
+        const sz = 1.5 + k * 2.5;
+        ctx.fillStyle = k > 0.02 ? `rgba(255, 255, 255, ${0.25 + k * 0.7})` : "rgba(236, 230, 218, 0.22)";
+        ctx.fillRect(px - sz / 2, py - sz / 2, sz, sz);
+      }
+      for (const inp of near) { // the path the pointer has just taken
+        const tr = inp.trail;
+        for (let t = 1; t < tr.length; t++) {
+          ctx.strokeStyle = `rgba(224, 103, 47, ${(t / tr.length) * 0.8})`; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.moveTo(tr[t - 1][0], tr[t - 1][1]); ctx.lineTo(tr[t][0], tr[t][1]); ctx.stroke();
+        }
+      }
+      drawBlobs(ctx, blobs, W, H, 44, 10);
+    };
+    const frame = () => {
+      for (const inp of inputs.values()) { deposit(inp.x, inp.y, 0.12, R); inp.idle = inp.moved ? 0 : (inp.idle || 0) + 1; if (inp.idle > 8 && inp.trail.length > 1) inp.trail.shift(); inp.moved = false; } // a held pointer keeps its blob alive; its trail fades once it rests
+      let alive = inputs.size > 0;
+      for (let k = 0; k < heat.length; k++) { const v = heat[k]; if (v > 0.004) { heat[k] = v * 0.972; alive = true; } else heat[k] = 0; }
+      if (alive || live > 0) {
+        live = alive ? 30 : live - 1;
+        find(); draw();
+        if (readout && ++tick % 5 === 0) readout.textContent = blobs.length ? `blobs ${blobs.length}   id ${pad2(blobs[0].id % 100)}   x ${(blobs[0].x / W).toFixed(3)}   y ${(blobs[0].y / H).toFixed(3)}` : "blobs 0   waiting for input";
+      }
+      requestAnimationFrame(frame);
+    };
+
+    size(); draw();
+    addEventListener("resize", size);
+    if (!reduceMotion) {
+      const set = (id, x, y, burst) => {
+        const inp = inputs.get(id);
+        if (inp) { stroke(inp, x, y); inp.trail.push([x, y]); if (inp.trail.length > 26) inp.trail.shift(); inp.moved = true; } else inputs.set(id, { x, y, trail: [[x, y]], moved: true });
+        if (burst) deposit(x, y, 1.1, coarse ? 5 : 4);
+        live = 30;
+      };
+      addEventListener("pointermove", (e) => { if (e.pointerType !== "touch") set("m", e.clientX, e.clientY); }, { passive: true });
+      addEventListener("pointerdown", (e) => { if (e.pointerType !== "touch") set("m", e.clientX, e.clientY, true); }, { passive: true });
+      document.addEventListener("pointerleave", () => inputs.delete("m"));
+      // touch: every finger is its own blob; touch events keep firing while the page scrolls
+      const each = (e, fn) => { for (const t of e.changedTouches) fn(t); };
+      addEventListener("touchstart", (e) => each(e, (t) => set("t" + t.identifier, t.clientX, t.clientY, true)), { passive: true });
+      addEventListener("touchmove", (e) => each(e, (t) => set("t" + t.identifier, t.clientX, t.clientY)), { passive: true });
+      const lift = (e) => each(e, (t) => inputs.delete("t" + t.identifier));
+      addEventListener("touchend", lift, { passive: true }); addEventListener("touchcancel", lift, { passive: true });
+      addEventListener("blur", () => inputs.clear()); // never leave a blob stuck if the page loses focus
+      document.addEventListener("visibilitychange", () => { if (document.hidden) inputs.clear(); });
+      requestAnimationFrame(frame);
+    }
   }
 
+  // touch: dragging a finger across a media frame tilts it, as the mouse does on a computer
+  if (!finePointer && !reduceMotion) {
+    $$("[data-tilt]").forEach((el) => {
+      const max = +el.dataset.tilt || 3;
+      const lean = (e) => {
+        const t = e.touches[0]; if (!t) return;
+        const r = el.getBoundingClientRect(), fx = (t.clientX - r.left) / r.width - 0.5, fy = (t.clientY - r.top) / r.height - 0.5;
+        el.style.transition = "transform .1s linear"; el.style.transform = `perspective(1200px) rotateX(${(-fy * max).toFixed(2)}deg) rotateY(${(fx * max).toFixed(2)}deg)`;
+      };
+      const rest = () => { el.style.transition = "transform .6s cubic-bezier(.22, 1, .36, 1)"; el.style.transform = ""; };
+      el.addEventListener("touchstart", lean, { passive: true }); el.addEventListener("touchmove", lean, { passive: true });
+      el.addEventListener("touchend", rest, { passive: true }); el.addEventListener("touchcancel", rest, { passive: true });
+    });
+  }
   if (!FX) return;
 
   /* ================= Pointer effects (mouse only) ================= */
@@ -199,7 +313,7 @@
   document.body.appendChild(peek);
   const peekImg = peek.firstChild;
 
-  let mx = -100, my = -100, cx = -100, cy = -100, kx = 0, ky = 0, sx = 0, sy = 0, qx = 0, qy = 0, fieldIn = false, fieldDirty = 0, peekOn = false;
+  let mx = -100, my = -100, cx = -100, cy = -100, kx = 0, ky = 0, sx = 0, sy = 0, qx = 0, qy = 0, peekOn = false;
   const depthEls = $$("[data-depth]").map((el) => [el, +el.dataset.depth]);
 
   addEventListener("pointermove", (e) => {
@@ -213,15 +327,8 @@
     const row = t && t.closest("[data-peek]");
     if (row) { if (peekImg.getAttribute("src") !== row.dataset.peek) peekImg.src = row.dataset.peek; peekOn = true; } else peekOn = false;
     peek.classList.toggle("on", peekOn);
-    if (drawField) { // the field covers the whole window, so it follows the pointer in every section
-      fieldIn = true;
-      drawField.trail.push([mx, my]); if (drawField.trail.length > 26) drawField.trail.shift();
-      drawField.pos = [mx, my];
-      if (readout) readout.innerHTML = `tracking pointer <b>x ${(mx / innerWidth).toFixed(3)}</b> <b>y ${(my / innerHeight).toFixed(3)}</b>`;
-      fieldDirty = 40;
-    }
   }, { passive: true });
-  document.addEventListener("pointerleave", () => { cursor.classList.remove("on"); peek.classList.remove("on"); fieldIn = false; fieldDirty = 40; });
+  document.addEventListener("pointerleave", () => { cursor.classList.remove("on"); peek.classList.remove("on"); });
   addEventListener("pointerdown", () => cursor.classList.add("down"));
   addEventListener("pointerup", () => cursor.classList.remove("down"));
 
@@ -261,12 +368,6 @@
       const px = Math.min(qx + 28, innerWidth - 360), py = Math.min(Math.max(qy - 96, 64), innerHeight - 210);
       peek.style.transform = `translate3d(${px.toFixed(1)}px, ${py.toFixed(1)}px, 0)`;
     } else { qx = mx; qy = my; }
-    if (drawField && fieldDirty > 0) {
-      fieldDirty--;
-      const tr = drawField.trail; if (!fieldIn || fieldDirty < 30) tr.shift(); // the path fades once the pointer rests or leaves
-      const p = drawField.pos || [0, 0];
-      drawField(p[0], p[1], fieldIn);
-    }
     requestAnimationFrame(loop);
   };
   loop();
