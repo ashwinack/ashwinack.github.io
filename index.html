@@ -172,22 +172,12 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 .reel > img { object-position: 50% 16%; }
 .reel > video { background: #000; }
 .reel > video:not([controls]) { pointer-events: none; } /* billboard: nothing to click, no right-click menu */
-/* one card for applications, games and sensor experiences, with each part described inside it */
-.mix { padding: clamp(22px, 3vw, 36px); display: grid; gap: clamp(20px, 2.4vw, 28px); }
-.mix-head { display: grid; gap: 10px; justify-items: start; }
+/* one card for applications, games and sensor experiences: a short description and one Watch button */
+.mix { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 40px; padding: clamp(22px, 3vw, 36px); }
+.mix-head { display: grid; gap: 10px; flex: 1 1 420px; }
 .mix-head h3 { font-size: clamp(1.5rem, 2.8vw, 2.25rem); line-height: 1.08; letter-spacing: -.035em; }
 .mix-head p { color: var(--text-soft); max-width: 66ch; }
-.mix-head .watch-btn { margin-top: 6px; }
-.mix-items { display: grid; gap: 12px; }
-@media (min-width: 840px) { .mix-items { grid-template-columns: repeat(3, 1fr); } }
-.mix-item { display: flex; flex-direction: column; gap: 14px; padding: 22px; border-radius: 18px; background: rgba(var(--fg-rgb), .04); box-shadow: inset 0 0 0 1px var(--line); }
-.mix-item svg { flex: none; width: 34px; height: 34px; color: var(--accent2); filter: drop-shadow(0 0 12px rgba(var(--accent2-rgb), .6)); }
-.mix-item h4 { margin-bottom: 6px; font-family: var(--font-head); font-size: 1.1875rem; font-weight: 600; letter-spacing: -.02em; line-height: 1.2; }
-.mix-item p { color: var(--text-soft); font-size: .9375rem; }
-.mix-item .mix-includes { margin-top: 10px; color: var(--muted); font-size: .8125rem; }
-.mix-count { align-self: flex-start; margin-top: auto; padding: 6px 0; border: 0; background: none; cursor: pointer; font: inherit; font-size: .875rem; font-weight: 600; color: var(--accent2); touch-action: manipulation; }
-.mix-count::after { content: " \2192"; }
-.mix-count:hover { text-decoration: underline; text-underline-offset: 3px; }
+.mix .watch-btn { margin-top: 0; padding: 12px 22px 12px 16px; font-size: 1rem; }
 .sub-head { display: grid; gap: 10px; margin: clamp(56px, 8vw, 104px) 0 28px; }
 .sub-head h3 { font-size: clamp(1.75rem, 3.4vw, 2.75rem); line-height: 1.05; letter-spacing: -.04em; }
 .sub-head p { color: var(--text-soft); max-width: 46ch; }
@@ -301,13 +291,6 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 .viewer-list img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; display: block; }
 .viewer-list .vl-title { font-weight: 600; font-size: .9375rem; line-height: 1.25; padding: 0 4px; }
 .viewer-list small { padding: 0 4px 2px; font-size: .8125rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-.viewer-list .vl-tag { padding: 0 4px; font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent2); }
-.viewer-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.viewer-chips[hidden] { display: none; }
-.viewer-chips button { padding: 8px 14px; border: 0; border-radius: var(--r-pill); cursor: pointer; font: inherit; font-size: .875rem; font-weight: 600; color: var(--text-soft); background: rgba(var(--fg-rgb), .06); box-shadow: inset 0 0 0 1px var(--line); touch-action: manipulation; transition: background-color .2s, color .2s; }
-.viewer-chips button:hover { color: var(--text); background: rgba(var(--fg-rgb), .12); }
-.viewer-chips button[aria-pressed="true"] { color: var(--on-accent); background: var(--grad); box-shadow: none; }
-.viewer-chips small { margin-left: 4px; font-size: .8125rem; font-variant-numeric: tabular-nums; opacity: .75; }
 /* ============ COMMAND MENU ============ */
 .palette { width: min(640px, calc(100vw - 32px)); margin: 12vh auto auto; padding: 0; border: 0; border-radius: 20px; background: var(--surface-2); color: var(--text); overflow: hidden;
   box-shadow: 0 0 0 1px var(--line-strong), 0 40px 100px -20px rgba(0, 0, 0, .8), 0 0 80px -20px rgba(var(--accent-rgb), .5); }
@@ -499,38 +482,9 @@ main { position: relative; z-index: 2; overflow-x: clip; }
         <div class="mix neon-edge rv" data-video-id="interactive">
           <div class="mix-head">
             <h3>Applications, games and sensor experiences</h3>
-            <p>Interactive software for real-world use. Each piece connects to real hardware such as touch screens, hand trackers, wearables and IoT sensors.</p>
-            <div data-watch-slot></div>
+            <p>Interactive applications, arcade and casual games, and sensor-based environments. All of it is built around real hardware: IoT devices, motion and pressure sensors, and custom input devices.</p>
           </div>
-          <ul class="mix-items">
-            <li class="mix-item" data-mix="apps">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
-              <div>
-                <h4>Interactive applications</h4>
-                <p>Applications integrated with IoT hardware, sensors and custom input devices for real-world interaction.</p>
-                <p class="mix-includes"></p>
-              </div>
-              <button type="button" class="mix-count"></button>
-            </li>
-            <li class="mix-item" data-mix="games">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="11" rx="3"/><path d="M7 10.5v4M5 12.5h4M16 11h.01M18.5 14h.01"/></svg>
-              <div>
-                <h4>Arcade and casual games</h4>
-                <p>Engaging arcade and casual games with custom hardware integration.</p>
-                <p class="mix-includes"></p>
-              </div>
-              <button type="button" class="mix-count"></button>
-            </li>
-            <li class="mix-item" data-mix="sensors">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2"/></svg>
-              <div>
-                <h4>Sensor-based experiences</h4>
-                <p>Interactive environments built with motion sensors, pressure sensors and other IoT technologies.</p>
-                <p class="mix-includes"></p>
-              </div>
-              <button type="button" class="mix-count"></button>
-            </li>
-          </ul>
+          <div data-watch-slot></div>
         </div>
       </div>
 
@@ -713,51 +667,27 @@ main { position: relative; z-index: 2; overflow-x: clip; }
   {
     "interactive": {
       "title": "Applications, games and sensor experiences",
-      "desc": "Interactive software connected to real hardware: applications, arcade and casual games, and sensor-based environments.",
-      "merge": [
-        { "id": "apps", "label": "Applications" },
-        { "id": "games", "label": "Games" },
-        { "id": "sensors", "label": "Sensors" }
-      ]
-    },
-    "apps": {
-      "hidden": true,
-      "title": "Interactive applications",
-      "desc": "Applications integrated with IoT hardware, sensors and custom input devices for real-world interaction.",
+      "desc": "Interactive applications, arcade and casual games, and sensor-based environments, all built around real hardware.",
       "clips": [
         { "title": "3D virtual tour", "len": "1:14", "src": "media/virtual-tour.mp4?v=2", "poster": "media/virtual-tour.jpg", "note": "A building explorer: a touchscreen controls a 3D virtual tour of a city and its towers on a large wall display." },
+        { "title": "Leap Motion slicing game", "portrait": true, "len": "0:36", "src": "media/leap-fruit.mp4?v=2", "poster": "media/leap-fruit.jpg", "note": "A Unity game played in mid-air: a Leap Motion hand tracker turns hand movement into slicing." },
+        { "title": "Gesture-controlled LED tower", "portrait": true, "len": "1:30", "src": "media/led-gesture.mp4", "poster": "media/led-gesture.jpg", "note": "Hand gestures control a tower of LED tubes, with sound. This clip is filmed upright on a phone." },
         { "title": "Audio-reactive wave visuals", "len": "1:20", "src": "media/td-audio-wave.mp4", "poster": "media/td-audio-wave.jpg", "note": "A wave visual with colour, speed and audio-reactivity controls, built in TouchDesigner. This clip has sound." },
+        { "title": "Leap Motion photo puzzle", "len": "0:48", "src": "media/leap-puzzle.mp4?v=2", "poster": "media/leap-puzzle.jpg", "note": "Photo Puzzle: pinch to pick up jigsaw pieces and place them, using hand tracking from a Leap Motion." },
+        { "title": "Hand-tracked particles", "len": "0:44", "src": "media/td-hand-particles.mp4", "poster": "media/td-hand-particles.jpg", "note": "Hand tracking from a webcam drives particle effects, built in TouchDesigner." },
         { "title": "Touch quiz kiosk", "portrait": true, "len": "1:16", "src": "media/quiz-kiosk.mp4", "poster": "media/quiz-kiosk.jpg", "note": "An upright touch-screen kiosk runs a multiple-choice quiz and shows each player's score." },
+        { "title": "Touch memory game", "portrait": true, "len": "0:48", "src": "media/memory-game.mp4", "poster": "media/memory-game.jpg", "note": "A card-matching memory game on an upright touch kiosk, from sign-up to the winning screen." },
+        { "title": "Sports booth challenge", "len": "0:39", "src": "media/sports-booth.mp4", "poster": "media/sports-booth.jpg", "note": "An interactive sports booth: a staff member starts the game on a red touch screen while visitors play on the turf." },
         { "title": "Interactive map wall", "len": "1:50", "src": "media/map-wall.mp4", "poster": "media/map-wall.jpg", "note": "A large video wall shows a map that opens up facts and figures as it is explored." },
+        { "title": "Spin-the-wheel game", "portrait": true, "len": "1:08", "src": "media/prize-wheel.mp4", "poster": "media/prize-wheel.jpg", "note": "A spin-the-wheel prize game on a tablet, shown at a live event with LED screens behind it." },
+        { "title": "Gesture ring", "portrait": true, "len": "1:04", "src": "media/gesture-ring.mp4", "poster": "media/gesture-ring.jpg", "note": "A hand over a ring-shaped sensor controls the content on a tall LED display." },
         { "title": "Interactive LED wall", "portrait": true, "len": "1:33", "src": "media/led-circuit-wall.mp4?v=2", "poster": "media/led-circuit-wall.jpg", "note": "A big LED wall in an exhibition hall shows circuit-style visuals and menus." },
+        { "title": "Wearable-controlled shooter", "len": "0:54", "src": "media/wearable-shooter.mp4?v=2", "poster": "media/wearable-shooter.jpg", "note": "A shooting game on a big screen, played with a controller worn on the wrist." },
+        { "title": "Interactive display cases", "portrait": true, "len": "1:30", "src": "media/display-cases.mp4?v=2", "poster": "media/display-cases.jpg", "note": "Visitors walk up to lit display cases in a showroom and interact with them." },
         { "title": "Tablet-controlled LED wall", "len": "2:27", "src": "media/tablet-wall.mp4", "poster": "media/tablet-wall.jpg", "note": "A tablet in the visitor's hands controls the content on a large LED wall." },
+        { "title": "Place-the-cube trigger", "portrait": true, "len": "0:53", "src": "media/cube-trigger.mp4", "poster": "media/cube-trigger.jpg", "note": "Placing a cube on the pedestal changes the content on the LED wall behind it." },
         { "title": "Tablet quiz wall", "len": "0:43", "src": "media/quiz-wall.mp4", "poster": "media/quiz-wall.jpg", "note": "Quiz questions appear on a large wall while players answer on a tablet." },
         { "title": "Touch-driven video wall", "len": "1:07", "src": "media/video-wall-control.mp4", "poster": "media/video-wall-control.jpg", "note": "Content cards float across a large blue video wall, steered from a small control screen below it." }
-      ]
-    },
-    "games": {
-      "hidden": true,
-      "title": "Arcade and casual games",
-      "desc": "Engaging arcade and casual games with custom hardware integration.",
-      "clips": [
-        { "title": "Leap Motion slicing game", "portrait": true, "len": "0:36", "src": "media/leap-fruit.mp4?v=2", "poster": "media/leap-fruit.jpg", "note": "A Unity game played in mid-air: a Leap Motion hand tracker turns hand movement into slicing." },
-        { "title": "Leap Motion photo puzzle", "len": "0:48", "src": "media/leap-puzzle.mp4?v=2", "poster": "media/leap-puzzle.jpg", "note": "Photo Puzzle: pinch to pick up jigsaw pieces and place them, using hand tracking from a Leap Motion." },
-        { "title": "Touch memory game", "portrait": true, "len": "0:48", "src": "media/memory-game.mp4", "poster": "media/memory-game.jpg", "note": "A card-matching memory game on an upright touch kiosk, from sign-up to the winning screen." },
-        { "title": "Spin-the-wheel game", "portrait": true, "len": "1:08", "src": "media/prize-wheel.mp4", "poster": "media/prize-wheel.jpg", "note": "A spin-the-wheel prize game on a tablet, shown at a live event with LED screens behind it." },
-        { "title": "Wearable-controlled shooter", "len": "0:54", "src": "media/wearable-shooter.mp4?v=2", "poster": "media/wearable-shooter.jpg", "note": "A shooting game on a big screen, played with a controller worn on the wrist." }
-      ]
-    },
-    "sensors": {
-      "hidden": true,
-      "title": "Sensor-based experiences",
-      "desc": "Interactive environments built with motion sensors, pressure sensors and other IoT technologies.",
-      "clips": [
-        { "title": "Gesture-controlled LED tower", "portrait": true, "len": "1:30", "src": "media/led-gesture.mp4", "poster": "media/led-gesture.jpg", "note": "Hand gestures control a tower of LED tubes, with sound. This clip is filmed upright on a phone." },
-        { "title": "Hand-tracked particles", "len": "0:44", "src": "media/td-hand-particles.mp4", "poster": "media/td-hand-particles.jpg", "note": "Hand tracking from a webcam drives particle effects, built in TouchDesigner." },
-        { "title": "Sports booth challenge", "len": "0:39", "src": "media/sports-booth.mp4", "poster": "media/sports-booth.jpg", "note": "An interactive sports booth: a staff member starts the game on a red touch screen while visitors play on the turf." },
-        { "title": "Gesture ring", "portrait": true, "len": "1:04", "src": "media/gesture-ring.mp4", "poster": "media/gesture-ring.jpg", "note": "A hand over a ring-shaped sensor controls the content on a tall LED display." },
-        { "title": "Interactive display cases", "portrait": true, "len": "1:30", "src": "media/display-cases.mp4?v=2", "poster": "media/display-cases.jpg", "note": "Visitors walk up to lit display cases in a showroom and interact with them." },
-        { "title": "Place-the-cube trigger", "portrait": true, "len": "0:53", "src": "media/cube-trigger.mp4", "poster": "media/cube-trigger.jpg", "note": "Placing a cube on the pedestal changes the content on the LED wall behind it." }
       ]
     },
     "lidar": {
@@ -812,7 +742,6 @@ main { position: relative; z-index: 2; overflow-x: clip; }
       </header>
       <div class="viewer-stage"><video id="viewerVideo" controls playsinline preload="none"></video></div>
       <p class="viewer-note" id="viewerNote"></p>
-      <div class="viewer-chips" id="viewerChips" role="group" aria-label="Filter videos by type" hidden></div>
       <ul class="viewer-list" id="viewerList" aria-label="Videos in this section"></ul>
     </div>
   </dialog>
@@ -1006,11 +935,7 @@ main { position: relative; z-index: 2; overflow-x: clip; }
   /* ---------- Video viewer: open any option and watch its videos ---------- */
   // The list of videos lives in <script id="videoData"> in index.html. Options with clips get a "Watch" button.
   const VIDEO_DATA = (() => { try { return JSON.parse($("#videoData").textContent); } catch (e) { return {}; } })();
-  const viewer = $("#viewer"), vVideo = $("#viewerVideo"), vList = $("#viewerList"), vNote = $("#viewerNote"), vStage = $(".viewer-stage", viewer), vChips = $("#viewerChips");
-  // An entry either lists its own clips, or "merge"s other entries into one (each clip remembers which part it came from).
-  const clipsOf = (d) => d.merge
-    ? d.merge.flatMap((m) => ((VIDEO_DATA[m.id] && VIDEO_DATA[m.id].clips) || []).map((c) => ({ ...c, group: m.id, groupLabel: m.label })))
-    : (d.clips || []);
+  const viewer = $("#viewer"), vVideo = $("#viewerVideo"), vList = $("#viewerList"), vNote = $("#viewerNote"), vStage = $(".viewer-stage", viewer);
   const PLAY_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>';
   const loadClip = (clips, i, autoplay) => {
     const c = clips[i];
@@ -1019,33 +944,15 @@ main { position: relative; z-index: 2; overflow-x: clip; }
     $$("button", vList).forEach((b) => b.setAttribute("aria-current", String(+b.dataset.i === i)));
     if (autoplay) { const p = vVideo.play(); if (p) p.catch(() => {}); }
   };
-  const openViewer = (id, group) => {
+  const openViewer = (id) => {
     const d = VIDEO_DATA[id];
-    if (!d) return;
-    const clips = clipsOf(d);
-    if (!clips.length) return;
+    if (!d || !d.clips || !d.clips.length) return;
     $$("video").forEach((v) => { if (v !== vVideo) v.pause(); }); // never two videos at once
     $("#viewerTitle").textContent = d.title; $("#viewerDesc").textContent = d.desc;
-    let filter = d.merge && d.merge.some((m) => m.id === group) ? group : "all";
-    const renderList = () => {
-      const idx = clips.map((c, i) => i).filter((i) => filter === "all" || clips[i].group === filter);
-      vList.innerHTML = idx.map((i) => { const c = clips[i]; return `<li><button type="button" data-i="${i}"><img src="${c.poster}" alt="" width="320" height="180" loading="lazy">${d.merge && filter === "all" ? `<span class="vl-tag">${c.groupLabel}</span>` : ""}<span class="vl-title">${c.title}</span><small>${c.len}</small></button></li>`; }).join("");
-      vList.hidden = idx.length < 2;
-      return idx;
-    };
-    vList.onclick = (e) => { const b = e.target.closest("button"); if (b) loadClip(clips, +b.dataset.i, true); };
-    if (d.merge) { // filter chips: All / Applications / Games / Sensors
-      const tabs = [{ id: "all", label: "All", n: clips.length }, ...d.merge.map((m) => ({ id: m.id, label: m.label, n: clips.filter((c) => c.group === m.id).length }))];
-      vChips.innerHTML = tabs.map((t) => `<button type="button" data-g="${t.id}" aria-pressed="${t.id === filter}">${t.label} <small>${t.n}</small></button>`).join("");
-      vChips.hidden = false;
-      vChips.onclick = (e) => {
-        const b = e.target.closest("button"); if (!b) return;
-        filter = b.dataset.g;
-        $$("button", vChips).forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
-        loadClip(clips, renderList()[0], true);
-      };
-    } else { vChips.hidden = true; vChips.innerHTML = ""; vChips.onclick = null; }
-    loadClip(clips, renderList()[0], true);
+    vList.innerHTML = d.clips.map((c, i) => `<li><button type="button" data-i="${i}"><img src="${c.poster}" alt="" width="320" height="180" loading="lazy"><span class="vl-title">${c.title}</span><small>${c.len}</small></button></li>`).join("");
+    vList.hidden = d.clips.length < 2;
+    vList.onclick = (e) => { const b = e.target.closest("button"); if (b) loadClip(d.clips, +b.dataset.i, true); };
+    loadClip(d.clips, 0, true);
     viewer.showModal();
   };
   viewer.addEventListener("close", () => { vVideo.pause(); vVideo.removeAttribute("src"); vVideo.load(); reelSync(); }); // stop the download too, and let the trailer carry on
@@ -1053,29 +960,15 @@ main { position: relative; z-index: 2; overflow-x: clip; }
   $("#viewerClose").addEventListener("click", () => viewer.close());
   $$("[data-video-id]").forEach((el) => {
     const id = el.dataset.videoId, d = VIDEO_DATA[id];
-    if (!d) return;
-    const n = clipsOf(d).length;
-    if (!n) return;
-    const b = document.createElement("button");
+    if (!d || !d.clips || !d.clips.length) return;
+    const n = d.clips.length, b = document.createElement("button");
     b.type = "button"; b.className = "watch-btn"; b.setAttribute("aria-haspopup", "dialog");
     b.innerHTML = `${PLAY_ICON}<span>Watch ${n > 1 ? `${n} videos` : "video"}</span>`;
     (el.querySelector("[data-watch-slot]") || el.querySelector(".tile-body") || el.querySelector("div") || el).appendChild(b);
     el.classList.add("has-videos");
     el.addEventListener("click", () => openViewer(id)); // the whole card is clickable; the button is the keyboard route
   });
-  // The merged card describes each part inside it: what it includes, plus a button that opens just that part's videos.
-  $$("[data-mix]").forEach((item) => {
-    const g = item.dataset.mix, list = (VIDEO_DATA[g] && VIDEO_DATA[g].clips) || [], root = item.closest("[data-video-id]");
-    if (!list.length || !root) return;
-    const inc = $(".mix-includes", item), cnt = $(".mix-count", item), name = $("h4", item).textContent;
-    if (inc) inc.textContent = `Includes ${list.slice(0, 3).map((c) => c.title).join(", ")}${list.length > 3 ? ` and ${list.length - 3} more` : ""}.`;
-    if (cnt) {
-      cnt.textContent = `${list.length} videos`;
-      cnt.setAttribute("aria-label", `Watch the ${list.length} ${name.toLowerCase()} videos`);
-      cnt.addEventListener("click", (e) => { e.stopPropagation(); openViewer(root.dataset.videoId, g); });
-    }
-  });
-  const videoActions = Object.entries(VIDEO_DATA).filter(([, d]) => !d.hidden && clipsOf(d).length).map(([id, d]) => ({ label: `Watch videos: ${d.title}`, hint: "Videos", run: () => openViewer(id) }));
+  const videoActions = Object.entries(VIDEO_DATA).filter(([, d]) => d.clips && d.clips.length).map(([id, d]) => ({ label: `Watch videos: ${d.title}`, hint: "Videos", run: () => openViewer(id) }));
   /* ---------- Copy email ---------- */
   const copyEmail = async () => {
     const email = $("#copyEmail").dataset.email;
