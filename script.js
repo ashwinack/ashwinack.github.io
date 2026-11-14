@@ -44,7 +44,7 @@
   const featured = $("#featured");
   if (featured) {
     featured.innerHTML = PROJECTS.filter((p) => p.featured).sort((a, b) => a.featured - b.featured).map((p, i) => `
-      <li class="feat reveal"><a href="${link(p)}" data-cursor="View">
+      <li class="feat reveal"><a href="${link(p)}" data-cursor="View" data-video="${esc(p.video || "")}">
         <div class="frame" data-tilt="3"><img src="${esc(p.poster)}" alt="Still from ${esc(p.title)}" width="1280" height="720" loading="lazy" decoding="async"></div>
         <div class="feat-txt">
           <span class="feat-no mono">${pad(i + 1)}${p.year ? ` / ${esc(p.year)}` : ""}</span>
@@ -60,7 +60,7 @@
     const catChips = $("#catChips"), techChips = $("#techChips"), count = $("#archiveCount"), empty = $("#archiveEmpty");
     const state = { cat: "all", tech: "all" };
     grid.innerHTML = PROJECTS.map((p, i) => `
-      <li><a class="row" href="${link(p)}" data-cursor="View" data-peek="${esc(p.poster)}">
+      <li><a class="row" href="${link(p)}" data-cursor="View" data-peek="${esc(p.poster)}" data-video="${esc(p.video || "")}">
         <span class="row-no mono">${pad(i + 1)}</span>
         <img class="thumb" src="${esc(p.poster)}" alt="Still from ${esc(p.title)}" width="224" height="126" loading="lazy" decoding="async">
         <h3>${esc(p.title)}</h3>
@@ -91,42 +91,96 @@
     apply();
   }
 
-  /* ---------- Project page: project.html?id=... ---------- */
+  /* ---------- Project detail: one template for project.html and for the viewer on the main page ---------- */
+  const detail = (p, i, inDialog) => {
+    const fact = (label, value) => (value ? `<div><dt>${label}</dt><dd>${esc(value)}</dd></div>` : "");
+    const facts = fact("Year", p.year) + fact("My role", p.role) + fact("Tools and protocols", (p.tools || []).join(", "));
+    const part = (title, text) => (text ? `<section><h2>${title}</h2><p>${esc(text)}</p></section>` : "");
+    const story = part("The problem", p.problem) + part("What I built", p.built) + part("Outcome", p.outcome);
+    const prev = PROJECTS[i - 1], next = PROJECTS[i + 1];
+    const go = (q, label) => !q ? "" : inDialog
+      ? `<button type="button" data-go="${esc(q.id)}"><span>${label}</span><b>${esc(q.title)}</b></button>`
+      : `<a href="${link(q)}" data-cursor="View"><span>${label}</span><b data-split>${esc(q.title)}</b></a>`;
+    const T = inDialog ? "h2" : "h1";
+    return `
+      <${T} class="p-title"${inDialog ? ' id="viewerTitle"' : ""}>${esc(p.title)}</${T}>
+      <p class="summary">${esc(p.summary)}</p>
+      <div class="tags">${tagsHtml(p)}</div>
+      ${p.signal && p.signal.length ? `<p class="signal" aria-label="Signal path: ${esc(p.signal.join(", then "))}">${p.signal.map(esc).join(' <i aria-hidden="true">→</i> ')}</p>` : ""}
+      ${p.video ? `<figure class="media frame${p.portrait ? " portrait" : ""}" data-cursor="Play"><video controls playsinline preload="metadata" poster="${esc(p.poster)}" aria-label="Video of ${esc(p.title)}${p.sound ? ", with sound" : ", no sound"}"><source src="${esc(p.video)}" type="video/mp4"></video></figure>` : ""}
+      ${p.images && p.images.length ? `<div class="shots">${p.images.map((src, k) => `<img src="${esc(src)}" alt="${esc(p.title)}, photo ${k + 1}" loading="lazy" decoding="async">`).join("")}</div>` : ""}
+      ${facts ? `<dl class="facts">${facts}</dl>` : ""}
+      ${story ? `<div class="story">${story}</div>` : ""}
+      <nav class="pager" aria-label="More projects">${go(prev, "Previous")}${go(next, "Next")}</nav>`;
+  };
+  const wireVideo = (root) => { // the cursor label follows the player state
+    const fig = $(".media", root), vid = fig && $("video", fig);
+    if (vid) { const lab = () => { fig.dataset.cursor = vid.paused ? "Play" : "Pause"; }; vid.addEventListener("play", lab); vid.addEventListener("pause", lab); }
+  };
+
   const page = $("[data-project]");
   if (page) {
     const id = new URLSearchParams(location.search).get("id");
     const i = PROJECTS.findIndex((p) => p.id === id), p = PROJECTS[i];
     if (!p) {
-      page.innerHTML = `<a class="back" href="./#archive">← All projects</a><h1>Project not found</h1><p class="summary">That link does not match a project. Go back to the list and pick one.</p>`;
+      page.innerHTML = `<a class="back" href="videos.html">← All videos</a><h1>Project not found</h1><p class="summary">That link does not match a project. Go back to the list and pick one.</p>`;
     } else {
       document.title = `${p.title}, Ashwin CK`;
-      const fact = (label, value) => (value ? `<div><dt>${label}</dt><dd>${esc(value)}</dd></div>` : "");
-      const facts = fact("Year", p.year) + fact("My role", p.role) + fact("Tools and protocols", (p.tools || []).join(", "));
-      const part = (title, text) => (text ? `<section><h2>${title}</h2><p>${esc(text)}</p></section>` : "");
-      const story = part("The problem", p.problem) + part("What I built", p.built) + part("Outcome", p.outcome);
-      const prev = PROJECTS[i - 1], next = PROJECTS[i + 1];
-      page.innerHTML = `
-        <a class="back" href="./#archive">← All projects</a>
-        <h1>${esc(p.title)}</h1>
-        <p class="summary">${esc(p.summary)}</p>
-        <div class="tags">${tagsHtml(p)}</div>
-        ${p.signal && p.signal.length ? `<p class="signal" aria-label="Signal path: ${esc(p.signal.join(", then "))}">${p.signal.map(esc).join(' <i aria-hidden="true">→</i> ')}</p>` : ""}
-        ${p.video ? `<figure class="media frame${p.portrait ? " portrait" : ""}" data-cursor="Play"><video controls playsinline preload="metadata" poster="${esc(p.poster)}" aria-label="Video of ${esc(p.title)}${p.sound ? ", with sound" : ", no sound"}"><source src="${esc(p.video)}" type="video/mp4"></video></figure>` : ""}
-        ${p.images && p.images.length ? `<div class="shots">${p.images.map((src, k) => `<img src="${esc(src)}" alt="${esc(p.title)}, photo ${k + 1}" loading="lazy" decoding="async">`).join("")}</div>` : ""}
-        ${facts ? `<dl class="facts">${facts}</dl>` : ""}
-        ${story ? `<div class="story">${story}</div>` : ""}
-        <nav class="pager" aria-label="More projects">
-          ${prev ? `<a href="${link(prev)}" data-cursor="View"><span>Previous</span><b data-split>${esc(prev.title)}</b></a>` : ""}
-          ${next ? `<a href="${link(next)}" data-cursor="View"><span>Next</span><b data-split>${esc(next.title)}</b></a>` : ""}
-        </nav>`;
-      const fig = $(".media", page), vid = fig && $("video", fig);
-      if (vid) { // the cursor label follows the player state
-        const lab = () => { fig.dataset.cursor = vid.paused ? "Play" : "Pause"; };
-        vid.addEventListener("play", lab); vid.addEventListener("pause", lab);
-      }
+      page.innerHTML = `<a class="back" href="videos.html">← All videos</a>` + detail(p, i, false);
+      wireVideo(page);
     }
   }
 
+  /* ---------- Viewer on the main page: every project opens here, with its video playing ---------- */
+  const viewer = $("#viewer"), vBody = $("#viewerBody"), vCount = $("#viewerCount");
+  if (viewer) {
+    let cur = -1;
+    const show = (id) => {
+      const i = PROJECTS.findIndex((q) => q.id === id); if (i < 0) return;
+      cur = i; vBody.innerHTML = detail(PROJECTS[i], i, true); wireVideo(vBody);
+      vCount.textContent = `${String(i + 1).padStart(2, "0")} / ${PROJECTS.length}`;
+      $$("[data-go]", vBody).forEach((b) => b.addEventListener("click", () => show(b.dataset.go)));
+      viewer.scrollTop = 0;
+      if (!viewer.open) viewer.showModal();
+      history.replaceState(null, "", `#project=${id}`);
+      const v = $("video", vBody); if (v) { const pr = v.play(); if (pr) pr.catch(() => {}); } // opened by a click, so sound may play
+    };
+    viewer.addEventListener("close", () => {
+      const v = $("video", vBody); if (v) { v.pause(); v.removeAttribute("src"); v.load(); }
+      vBody.innerHTML = ""; history.replaceState(null, "", location.pathname + location.search);
+    });
+    $("#viewerClose").addEventListener("click", () => viewer.close());
+    viewer.addEventListener("click", (e) => { if (e.target === viewer) viewer.close(); });
+    viewer.addEventListener("keydown", (e) => {
+      if (e.target.closest && e.target.closest("video")) return; // arrow keys belong to the player when it has focus
+      if (e.key === "ArrowRight" && PROJECTS[cur + 1]) show(PROJECTS[cur + 1].id);
+      if (e.key === "ArrowLeft" && PROJECTS[cur - 1]) show(PROJECTS[cur - 1].id);
+    });
+    document.addEventListener("click", (e) => { // project links open the viewer; ctrl, shift and middle click still open the page
+      const a = e.target.closest && e.target.closest('a[href^="project.html"]');
+      if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault(); show(new URL(a.href).searchParams.get("id"));
+    });
+    const m = /^#project=(.+)$/.exec(location.hash); if (m) show(decodeURIComponent(m[1])); // a shared link opens straight on the video
+  }
+  /* ---------- Glimpse on the main page: the line under the video names the project on screen and opens it ---------- */
+  const gNow = $("#glimpseNow"), gVideo = $("#reel");
+  if (gNow && gVideo && window.GLIMPSE) {
+    const order = window.GLIMPSE.map((id) => PROJECTS.find((q) => q.id === id)).filter(Boolean), n = order.length;
+    const STEP = 1.9; // seconds each project is on screen: 2.2 s minus the 0.3 s dissolve
+    const ticks = $("#glimpseTicks"); if (ticks) ticks.innerHTML = order.map(() => "<i></i>").join("");
+    const tickEls = ticks ? $$("i", ticks) : [];
+    let shown = -1;
+    const update = () => {
+      const k = Math.max(0, Math.min(n - 1, Math.floor((gVideo.currentTime + 0.1) / STEP)));
+      if (k === shown) return; shown = k;
+      const q = order[k];
+      $("#glimpseNo").textContent = `${pad(k + 1)} / ${n}`; $("#glimpseTitle").textContent = q.title; gNow.href = link(q);
+      tickEls.forEach((el, i) => el.classList.toggle("on", i === k));
+    };
+    gVideo.addEventListener("timeupdate", update); gVideo.addEventListener("seeked", update); update();
+    const fr = $("#glimpseFrame"); if (fr) fr.addEventListener("click", () => gNow.click()); // a click on the video opens the project on screen
+  }
   /* ---------- Letter-level hover: split text into letters (screen readers still get the plain text) ---------- */
   $$("[data-split]").forEach((el) => {
     const text = el.textContent.trim(); let n = 0;
@@ -309,11 +363,11 @@
   document.body.appendChild(cursor);
   const cLabel = cursor.firstChild;
   const peek = document.createElement("div");
-  peek.className = "peek"; peek.setAttribute("aria-hidden", "true"); peek.innerHTML = '<img alt="">';
+  peek.className = "peek"; peek.setAttribute("aria-hidden", "true"); peek.innerHTML = '<img alt=""><video muted loop playsinline preload="none"></video>';
   document.body.appendChild(peek);
-  const peekImg = peek.firstChild;
+  const peekImg = peek.firstChild, peekVid = peek.lastChild;
 
-  let mx = -100, my = -100, cx = -100, cy = -100, kx = 0, ky = 0, sx = 0, sy = 0, qx = 0, qy = 0, peekOn = false;
+  let mx = -100, my = -100, cx = -100, cy = -100, kx = 0, ky = 0, sx = 0, sy = 0, qx = 0, qy = 0, peekOn = false, peekRow = null, peekTimer = 0;
   const depthEls = $$("[data-depth]").map((el) => [el, +el.dataset.depth]);
 
   addEventListener("pointermove", (e) => {
@@ -325,7 +379,17 @@
     cursor.classList.toggle("label", !!lab); cursor.classList.toggle("link", !lab && !!lnk);
     cLabel.textContent = lab ? lab.dataset.cursor : "";
     const row = t && t.closest("[data-peek]");
-    if (row) { if (peekImg.getAttribute("src") !== row.dataset.peek) peekImg.src = row.dataset.peek; peekOn = true; } else peekOn = false;
+    if (row) {
+      if (row !== peekRow) { // a new row: show its still at once, start its video after a short dwell
+        peekRow = row; clearTimeout(peekTimer); peekVid.classList.remove("on"); peekVid.removeAttribute("src"); peekVid.load();
+        peekImg.src = row.dataset.peek;
+        if (row.dataset.video) peekTimer = setTimeout(() => { peekVid.src = row.dataset.video; peekVid.play().then(() => peekVid.classList.add("on")).catch(() => {}); }, 220);
+      }
+      peekOn = true;
+    } else {
+      if (peekRow) { peekRow = null; clearTimeout(peekTimer); peekVid.pause(); peekVid.classList.remove("on"); peekVid.removeAttribute("src"); peekVid.load(); }
+      peekOn = false;
+    }
     peek.classList.toggle("on", peekOn);
   }, { passive: true });
   document.addEventListener("pointerleave", () => { cursor.classList.remove("on"); peek.classList.remove("on"); });
@@ -348,6 +412,14 @@
   };
   $$("[data-tilt]").forEach(tiltOn);
 
+  // featured images play their video, muted, while the pointer is on them
+  $$(".feat > a").forEach((a) => {
+    const fr = $(".frame", a); let vid = null, tm = 0;
+    a.addEventListener("pointerenter", () => { if (!a.dataset.video) return; tm = setTimeout(() => {
+      vid = document.createElement("video"); vid.className = "hover-video"; vid.muted = true; vid.loop = true; vid.playsInline = true; vid.src = a.dataset.video;
+      fr.appendChild(vid); vid.play().then(() => vid.classList.add("on")).catch(() => {}); }, 200); });
+    a.addEventListener("pointerleave", () => { clearTimeout(tm); if (vid) { vid.remove(); vid = null; } });
+  });
   // magnetic: navigation links lean toward the pointer
   $$("[data-magnetic]").forEach((el) => {
     el.addEventListener("pointermove", (e) => {
