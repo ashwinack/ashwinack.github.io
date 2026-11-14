@@ -349,6 +349,17 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 :root[data-style="pixel"] .cv, :root[data-style="pixel"] .hero-pic { image-rendering: pixelated; }
 :root[data-style="pixel"]::after { content: ""; position: fixed; inset: 0; z-index: 99; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .28) 0 1px, transparent 1px 3px); }
 
+/* ============ MOUSE INTERACTION ============ */
+.fx { --mx: 50%; --my: 50%; }
+.reach a { position: relative; }
+.fx::after { content: ""; position: absolute; inset: 0; z-index: 3; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .3s;
+  background: radial-gradient(420px circle at var(--mx) var(--my), rgba(var(--accent-rgb), .17), rgba(var(--accent2-rgb), .07) 42%, transparent 72%); }
+.fx:hover::after { opacity: 1; }
+.cursor-dot { position: fixed; left: 0; top: 0; z-index: 200; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; border: 1.5px solid rgba(var(--accent2-rgb), .75); background: transparent; pointer-events: none; opacity: 0; will-change: transform;
+  transition: opacity .3s, width .25s var(--ease), height .25s var(--ease), margin .25s var(--ease), background-color .25s; }
+.cursor-dot.hot { width: 64px; height: 64px; margin: -32px 0 0 -32px; background: rgba(var(--accent-rgb), .13); }
+.click-ring { position: fixed; z-index: 200; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; border: 2px solid rgba(var(--accent2-rgb), .9); pointer-events: none; animation: click-ring .7s var(--ease) forwards; }
+@keyframes click-ring { to { transform: scale(10); opacity: 0; } }
 </style>
   <noscript><style>.rv { opacity: 1 !important; transform: none !important; }</style></noscript>
 </head>
@@ -850,6 +861,64 @@ main { position: relative; z-index: 2; overflow-x: clip; }
     el.classList.add("has-videos");
     el.addEventListener("click", () => openViewer(id)); // the whole card is clickable; the button is the keyboard route
   });
+  /* ---------- Mouse interaction everywhere ---------- */
+  // Cards and panels light up where the pointer is, big ones tilt a little, buttons lean toward it,
+  // a ring follows it, the background drifts with it, and a click sends out a ripple.
+  if (finePointer && !reduceMotion) {
+    const spots = $$(".neon-edge, .bar, .reach a, .reach-row");
+    const TILT = { ".mix": 3, ".facts": 4, ".reel": 2.5 };
+    spots.forEach((el) => {
+      el.classList.add("fx");
+      const max = (Object.entries(TILT).find(([sel]) => el.matches(sel)) || [0, 0])[1];
+      let settle = 0;
+      el.addEventListener("pointermove", (e) => {
+        const r = el.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+        el.style.setProperty("--mx", `${x.toFixed(0)}px`); el.style.setProperty("--my", `${y.toFixed(0)}px`);
+        if (max && (el.classList.contains("in") || el.closest(".in"))) {
+          clearTimeout(settle);
+          el.style.transition = "transform .12s linear";
+          el.style.transform = `perspective(1100px) rotateX(${((0.5 - y / r.height) * max).toFixed(2)}deg) rotateY(${((x / r.width - 0.5) * max).toFixed(2)}deg)`;
+        }
+      });
+      if (max) el.addEventListener("pointerleave", () => {
+        el.style.transition = "transform .6s cubic-bezier(.22, 1, .36, 1)"; el.style.transform = "";
+        settle = setTimeout(() => { el.style.transition = ""; }, 650);
+      });
+    });
+    $$(".btn, .watch-btn").forEach((b) => {
+      b.addEventListener("pointermove", (e) => {
+        const r = b.getBoundingClientRect();
+        b.style.transform = `translate(${((e.clientX - (r.left + r.width / 2)) * 0.22).toFixed(1)}px, ${((e.clientY - (r.top + r.height / 2)) * 0.3).toFixed(1)}px)`;
+      });
+      b.addEventListener("pointerleave", () => { b.style.transform = ""; });
+    });
+
+    // a ring that trails the pointer and grows over things you can click
+    const dot = document.createElement("div");
+    dot.className = "cursor-dot"; dot.setAttribute("aria-hidden", "true"); document.body.appendChild(dot);
+    let px = -999, py = -999, dx = -999, dy = -999, nx = 0, ny = 0, sx = 0, sy = 0;
+    addEventListener("pointermove", (e) => {
+      px = e.clientX; py = e.clientY; nx = px / innerWidth - 0.5; ny = py / innerHeight - 0.5; dot.style.opacity = 1;
+      dot.classList.toggle("hot", !!(e.target.closest && e.target.closest("a, button, summary, canvas, .reel, [data-video-id]")));
+    }, { passive: true });
+    document.addEventListener("pointerleave", () => { dot.style.opacity = 0; });
+    // the hero picture and the colour orbs drift slightly against the pointer
+    const layers = $$(".hero-pic, .orb");
+    const follow = () => {
+      dx += (px - dx) * 0.2; dy += (py - dy) * 0.2; sx += (nx - sx) * 0.06; sy += (ny - sy) * 0.06;
+      dot.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)`;
+      layers.forEach((l, i) => { const k = l.classList.contains("hero-pic") ? 14 : 26 + (i % 3) * 10; l.style.translate = `${(-sx * k).toFixed(1)}px ${(-sy * k).toFixed(1)}px`; });
+      requestAnimationFrame(follow);
+    };
+    follow();
+  }
+  if (!reduceMotion) addEventListener("pointerdown", (e) => { // click or tap ripple anywhere except on the games, forms and videos
+    if (e.target.closest && e.target.closest("canvas, input, textarea, select, video")) return;
+    const ring = document.createElement("i");
+    ring.className = "click-ring"; ring.style.left = `${e.clientX}px`; ring.style.top = `${e.clientY}px`;
+    document.body.appendChild(ring); ring.addEventListener("animationend", () => ring.remove());
+  }, { passive: true });
+
   /* ---------- Copy email ---------- */
   const copyEmail = async () => {
     const email = $("#copyEmail").dataset.email;
