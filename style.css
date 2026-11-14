@@ -58,7 +58,8 @@ a:hover .sp-c, a:focus-visible .sp-c, .feat:hover .sp-c { transform: translateY(
 
 /* ---------- Hero ---------- */
 .hero { position: relative; border-bottom: 1px solid var(--rule); }
-.field { position: absolute; inset: 0; width: 100%; height: 100%; }
+.field { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
+main, .foot { position: relative; z-index: 1; }
 .hero-grid { position: relative; display: grid; gap: 32px; padding-block: 56px 40px; }
 .kicker { color: var(--ink-2); }
 .kicker i { font-style: normal; color: var(--accent); padding-inline: 4px; }
