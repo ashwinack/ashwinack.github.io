@@ -143,15 +143,15 @@
   }
 
   /* ---------- Hero field: a grid of points that reads the pointer like a tracking system ---------- */
-  const field = $("#field"), hero = field && field.closest(".hero"), readout = $("#readout");
+  const field = $("#field"), readout = $("#readout");
   let drawField = null;
   if (field) {
     const ctx = field.getContext("2d"), GAP = 30, REACH = 190;
     let W = 0, H = 0, pts = [];
     const trail = [];
     const size = () => {
-      const r = hero.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
-      W = r.width; H = r.height; field.width = Math.round(W * dpr); field.height = Math.round(H * dpr);
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      W = innerWidth; H = innerHeight; field.width = Math.round(W * dpr); field.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       pts = []; for (let y = GAP / 2; y < H; y += GAP) for (let x = GAP / 2; x < W; x += GAP) pts.push([x, y]);
     };
@@ -199,7 +199,7 @@
   document.body.appendChild(peek);
   const peekImg = peek.firstChild;
 
-  let mx = -100, my = -100, cx = -100, cy = -100, kx = 0, ky = 0, sx = 0, sy = 0, qx = 0, qy = 0, heroIn = false, heroDirty = 0, peekOn = false;
+  let mx = -100, my = -100, cx = -100, cy = -100, kx = 0, ky = 0, sx = 0, sy = 0, qx = 0, qy = 0, fieldIn = false, fieldDirty = 0, peekOn = false;
   const depthEls = $$("[data-depth]").map((el) => [el, +el.dataset.depth]);
 
   addEventListener("pointermove", (e) => {
@@ -213,19 +213,15 @@
     const row = t && t.closest("[data-peek]");
     if (row) { if (peekImg.getAttribute("src") !== row.dataset.peek) peekImg.src = row.dataset.peek; peekOn = true; } else peekOn = false;
     peek.classList.toggle("on", peekOn);
-    if (hero) {
-      const r = hero.getBoundingClientRect();
-      heroIn = my >= r.top && my <= r.bottom && mx >= r.left && mx <= r.right;
-      if (heroIn) {
-        const hx = mx - r.left, hy = my - r.top;
-        drawField.trail.push([hx, hy]); if (drawField.trail.length > 26) drawField.trail.shift();
-        drawField.pos = [hx, hy];
-        if (readout) readout.innerHTML = `tracking pointer <b>x ${(hx / r.width).toFixed(3)}</b> <b>y ${(hy / r.height).toFixed(3)}</b>`;
-      }
-      heroDirty = 40;
+    if (drawField) { // the field covers the whole window, so it follows the pointer in every section
+      fieldIn = true;
+      drawField.trail.push([mx, my]); if (drawField.trail.length > 26) drawField.trail.shift();
+      drawField.pos = [mx, my];
+      if (readout) readout.innerHTML = `tracking pointer <b>x ${(mx / innerWidth).toFixed(3)}</b> <b>y ${(my / innerHeight).toFixed(3)}</b>`;
+      fieldDirty = 40;
     }
   }, { passive: true });
-  document.addEventListener("pointerleave", () => { cursor.classList.remove("on"); peek.classList.remove("on"); });
+  document.addEventListener("pointerleave", () => { cursor.classList.remove("on"); peek.classList.remove("on"); fieldIn = false; fieldDirty = 40; });
   addEventListener("pointerdown", () => cursor.classList.add("down"));
   addEventListener("pointerup", () => cursor.classList.remove("down"));
 
@@ -265,11 +261,11 @@
       const px = Math.min(qx + 28, innerWidth - 360), py = Math.min(Math.max(qy - 96, 64), innerHeight - 210);
       peek.style.transform = `translate3d(${px.toFixed(1)}px, ${py.toFixed(1)}px, 0)`;
     } else { qx = mx; qy = my; }
-    if (drawField && heroDirty > 0) {
-      heroDirty--;
-      const tr = drawField.trail; if (!heroIn || heroDirty < 30) tr.shift(); // the path fades once the pointer rests or leaves
+    if (drawField && fieldDirty > 0) {
+      fieldDirty--;
+      const tr = drawField.trail; if (!fieldIn || fieldDirty < 30) tr.shift(); // the path fades once the pointer rests or leaves
       const p = drawField.pos || [0, 0];
-      drawField(p[0], p[1], heroIn);
+      drawField(p[0], p[1], fieldIn);
     }
     requestAnimationFrame(loop);
   };
