@@ -181,25 +181,6 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 .sub-head { display: grid; gap: 10px; margin: clamp(56px, 8vw, 104px) 0 28px; }
 .sub-head h3 { font-size: clamp(1.75rem, 3.4vw, 2.75rem); line-height: 1.05; letter-spacing: -.04em; }
 .sub-head p { color: var(--text-soft); max-width: 46ch; }
-.spec-grid { display: grid; gap: 16px; }
-@media (min-width: 900px) { .spec-grid { grid-template-columns: repeat(3, 1fr); } }
-.tile { position: relative; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; isolation: isolate; min-height: 340px; padding: 24px; border-radius: var(--r-card); background: var(--surface);
-  box-shadow: inset 0 0 0 1px var(--line); transition: box-shadow .3s, transform .3s var(--ease); outline-offset: 4px; }
-@media (min-width: 900px) { .tile { min-height: 420px; } }
-.tile::before { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; transition: opacity .3s;
-  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(var(--accent-rgb), .22), transparent 60%); }
-.tile:hover, .tile:focus-visible { transform: translateY(-4px); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .7), 0 24px 60px -24px rgba(var(--accent-rgb), .55), 0 0 40px -14px rgba(var(--accent2-rgb), .5); }
-.tile:hover::before, .tile:focus-visible::before { opacity: 1; }
-.tile > img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease); }
-.tile:hover > img { transform: scale(1.06); }
-.tile > video { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s, transform .8s var(--ease); pointer-events: none; }
-.tile > video.on { opacity: 1; }
-.tile:hover > video { transform: scale(1.04); }
-.tile:has(> img, > video)::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, rgba(var(--bg-rgb), .92) 4%, rgba(var(--bg-rgb), .35) 55%, rgba(var(--bg-rgb), .05)); }
-.tile-body { position: relative; z-index: 3; display: grid; gap: 8px; }
-.tile h3 { font-size: clamp(1.5rem, 2.2vw, 2rem); line-height: 1.1; letter-spacing: -.03em; }
-.tile p { color: var(--text-soft); font-size: .9375rem; max-width: 44ch; }
-.credit { position: absolute; top: 14px; right: 14px; z-index: 3; padding: 4px 10px; border-radius: var(--r-pill); font-size: .8125rem; color: var(--text-soft); background: rgba(var(--bg-rgb), .6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 /* play */
 .arcade-grid { display: grid; gap: 24px; }
 @media (min-width: 1000px) { .arcade-grid { grid-template-columns: 1fr 1fr; } }
@@ -327,7 +308,6 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 @media (prefers-reduced-motion: no-preference) {
   .js .rv { opacity: 0; transform: translateY(28px); transition: opacity .8s var(--ease), transform .8s var(--ease); transition-delay: calc(var(--i, 0) * 80ms); }
   .js .in .rv, .js .rv.in { opacity: 1; transform: none; }
-  .js .tile.rv.in, .js .in .tile.rv { transition: opacity .8s var(--ease), transform .8s var(--ease), box-shadow .3s; }
   .orb { animation: drift 22s ease-in-out infinite alternate; }
   .o2 { animation-duration: 28s; animation-direction: alternate-reverse; }
   .o3 { animation-duration: 25s; }
@@ -378,7 +358,7 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 :root[data-style="pixel"] .hero h1 { font-size: clamp(1.4rem, 5.2vw, 4rem); line-height: 1.25; letter-spacing: 0; }
 :root[data-style="pixel"] h2 { font-size: clamp(1rem, 3vw, 2rem); max-width: 22ch; }
 :root[data-style="pixel"] .contact h2 { font-size: clamp(1.4rem, 5vw, 3.5rem); line-height: 1.25; letter-spacing: 0; }
-:root[data-style="pixel"] h3, :root[data-style="pixel"] .tile h3 { font-size: .8rem; letter-spacing: 0; }
+:root[data-style="pixel"] h3 { font-size: .8rem; letter-spacing: 0; }
 :root[data-style="pixel"] .bar summary { font-size: .8rem; letter-spacing: 0; }
 :root[data-style="pixel"] .logo { font-size: .8rem; letter-spacing: 0; }
 :root[data-style="pixel"] .ticker-track { font-size: 1rem; letter-spacing: 0; }
@@ -387,7 +367,7 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 :root[data-style="pixel"] .orb { filter: blur(60px); }
 :root[data-style="pixel"] .viewer, :root[data-style="pixel"] .viewer-stage, :root[data-style="pixel"] .viewer-list button, :root[data-style="pixel"] .viewer-list img, :root[data-style="pixel"] .viewer-close, :root[data-style="pixel"] .watch-btn { border-radius: 0; }
 :root[data-style="pixel"] .logo-mark, :root[data-style="pixel"] .badge-dot, :root[data-style="pixel"] .swatch i, :root[data-style="pixel"] .themer-btn, :root[data-style="pixel"] .bar summary::after, :root[data-style="pixel"] .bar::before { border-radius: 0; }
-:root[data-style="pixel"] .cv, :root[data-style="pixel"] .tile > img, :root[data-style="pixel"] .hero-pic { image-rendering: pixelated; }
+:root[data-style="pixel"] .cv, :root[data-style="pixel"] .hero-pic { image-rendering: pixelated; }
 :root[data-style="pixel"]::after { content: ""; position: fixed; inset: 0; z-index: 99; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .28) 0 1px, transparent 1px 3px); }
 
 </style>
@@ -492,32 +472,13 @@ main { position: relative; z-index: 2; overflow-x: clip; }
         <h3 class="rv">Beyond the screen</h3>
         <p class="rv">Where Unity meets LiDAR sensors, projectors and lasers.</p>
       </div>
-      <ul class="spec-grid">
-        <li class="tile rv" data-video-id="lidar">
-          <img src="assets/lidar-scan.jpg" width="1600" height="900" alt="A LiDAR scan of a city intersection drawn as glowing points" loading="lazy" decoding="async">
-          <div class="tile-body">
-            <h3>LiDAR touch walls</h3>
-            <p>LiDAR-enabled systems that turn walls and surfaces into interactive touch displays using projectors.</p>
-          </div>
-          <span class="credit" translate="no">Image: Daniel L. Lu, CC BY 4.0</span>
-        </li>
-        <li class="tile rv" data-video-id="projection">
-          <img src="assets/projection-mapping.jpg" width="1600" height="900" alt="A video-mapped light projection covering the facade of a building at night" loading="lazy" decoding="async">
-          <div class="tile-body">
-            <h3>Projection mapping</h3>
-            <p>Interactive projection mapping with touch and gesture-based interaction, plus immersive installations produced for events and exhibitions.</p>
-          </div>
-          <span class="credit" translate="no">Photo: Miguel Discart, CC BY-SA 2.0</span>
-        </li>
-        <li class="tile rv" data-video-id="laser">
-          <img src="assets/laser-show.jpg" width="1600" height="1067" alt="Blue and green laser beams fanning out above a waterfront skyline" loading="lazy" decoding="async">
-          <div class="tile-body">
-            <h3>Laser shows</h3>
-            <p>Laser effects designed and synchronized for live events, plus laser mapping and multimedia shows that sync laser, video and lighting.</p>
-          </div>
-          <span class="credit" translate="no">Photo: Erwin Soo, CC BY 2.0</span>
-        </li>
-      </ul>
+      <div class="mix neon-edge rv" data-video-id="beyond">
+        <div class="mix-head">
+          <h3>LiDAR, projection mapping and laser shows</h3>
+          <p>LiDAR systems that turn walls and surfaces into touch displays. Interactive projection mapping and immersive installations for events and exhibitions. Laser effects and multimedia shows that sync laser, video and lighting.</p>
+        </div>
+        <div data-watch-slot></div>
+      </div>
     </section>
     <!-- PLAY -->
     <section class="section" id="play" data-reveal aria-labelledby="play-title">
@@ -646,9 +607,7 @@ main { position: relative; z-index: 2; overflow-x: clip; }
       <a href="#top">Back to top</a>
     </div>
     <p class="credits">
-      Picture credits, all from Wikimedia Commons:
-      <a href="https://commons.wikimedia.org/wiki/File:Night_in_Brussels_-_2022-02-12_19-51-06_ILCE-7C_DSCAG3697_(51880271220).jpg" target="_blank" rel="noopener">video mapping in Brussels</a> by Miguel Discart (CC BY-SA 2.0);
-      <a href="https://commons.wikimedia.org/w/index.php?curid=25646071" target="_blank" rel="noopener">laser show at Marina Bay Sands</a> by Erwin Soo (CC BY 2.0);
+      Picture credit, from Wikimedia Commons:
       <a href="https://commons.wikimedia.org/w/index.php?curid=84598949" target="_blank" rel="noopener">Ouster LiDAR point cloud</a> by Daniel L. Lu (CC BY 4.0).
     </p>
   </footer>
@@ -690,39 +649,27 @@ main { position: relative; z-index: 2; overflow-x: clip; }
         { "title": "Touch-driven video wall", "len": "1:07", "src": "media/video-wall-control.mp4", "poster": "media/video-wall-control.jpg", "note": "Content cards float across a large blue video wall, steered from a small control screen below it." }
       ]
     },
-    "lidar": {
-      "title": "LiDAR touch walls",
-      "desc": "LiDAR-enabled systems that turn walls and surfaces into interactive touch displays using projectors.",
+    "beyond": {
+      "title": "LiDAR, projection mapping and laser shows",
+      "desc": "LiDAR touch walls, interactive projection mapping and immersive installations, and laser shows that sync laser, video and lighting.",
       "clips": [
         { "title": "Touch wall with audio", "len": "0:45", "src": "media/lidar-loom.mp4", "poster": "media/lidar-loom.jpg", "note": "Touch a large LED wall and the lines bend and change colour around the hand, with sound." },
-        { "title": "Fluid simulation wall", "len": "0:40", "src": "media/fluid-wall.mp4?v=2", "poster": "media/fluid-wall.jpg", "note": "The wall answers a touch with ripples from a fluid simulation, and logos appear under the hand." },
-        { "title": "Interactive floor", "portrait": true, "len": "0:52", "src": "media/floor-lights.mp4", "poster": "media/floor-lights.jpg", "note": "Coloured light follows every step across the floor. This clip is filmed upright on a phone." },
-        { "title": "Fluid simulation floor", "portrait": true, "len": "0:30", "src": "media/fluid-floor.mp4?v=2", "poster": "media/fluid-floor.jpg", "note": "Flowing, ink-like colour swirls follow every step across the floor. This clip is filmed upright on a phone." },
-        { "title": "Interactive wall map", "len": "0:59", "src": "media/wall-map.mp4", "poster": "media/wall-map.jpg", "note": "An illustrated wall map that responds to touch." },
-        { "title": "Interactive wall story", "len": "1:44", "src": "media/touch-story-wall.mp4", "poster": "media/touch-story-wall.jpg", "note": "A visitor touches a wide projected wall and cards of stories open and move." },
-        { "title": "Curved touch wall", "len": "0:52", "src": "media/curved-wall.mp4", "poster": "media/curved-wall.jpg", "note": "Two people explore a long curved projected wall: touch to open photos, numbers and maps." }
-      ]
-    },
-    "projection": {
-      "title": "Projection mapping",
-      "desc": "Interactive projection mapping with touch and gesture-based interaction, plus immersive installations produced for events and exhibitions.",
-      "clips": [
         { "title": "Immersive desert room", "len": "1:04", "src": "media/desert-room.mp4?v=2", "poster": "media/desert-room.jpg", "note": "A three-wall projection room plays a journey through desert, old town and city scenes." },
-        { "title": "Space immersive room", "len": "2:28", "src": "media/space-room.mp4?v=2", "poster": "media/space-room.jpg", "note": "Planets, a space station and nebulae wrap around the walls of an immersive room." },
-        { "title": "Sculpture projection", "portrait": true, "len": "0:46", "src": "media/head-projection.mp4", "poster": "media/head-projection.jpg", "note": "A sculpted head with glowing eyes, lit by projection in a dark room." },
-        { "title": "Projected exhibition wall", "len": "2:45", "src": "media/exhibition-wall.mp4", "poster": "media/exhibition-wall.jpg", "note": "Light and graphics projected across the walls of an exhibition stand, with screens set into the wall." },
-        { "title": "Glowing ring display", "portrait": true, "len": "0:20", "src": "media/green-ring.mp4", "poster": "media/green-ring.jpg", "note": "Glowing green, smoke-like visuals swirl inside a round display." },
-        { "title": "Immersive wave room", "len": "0:38", "src": "media/wave-room.mp4", "poster": "media/wave-room.jpg", "note": "A walk-in room with waves across the wall and an interactive floor." }
-      ]
-    },
-    "laser": {
-      "title": "Laser shows",
-      "desc": "Laser effects designed and synchronized for live events, plus laser mapping and multimedia shows that sync laser, video and lighting.",
-      "clips": [
         { "title": "Laser and video show", "portrait": true, "len": "0:56", "src": "media/laser-video.mp4?v=2", "poster": "media/laser-video.jpg", "note": "Laser beams sweep over a video wall and draw logos in light, in time with the video. This clip is filmed upright on a phone." },
+        { "title": "Fluid simulation wall", "len": "0:40", "src": "media/fluid-wall.mp4?v=2", "poster": "media/fluid-wall.jpg", "note": "The wall answers a touch with ripples from a fluid simulation, and logos appear under the hand." },
+        { "title": "Space immersive room", "len": "2:28", "src": "media/space-room.mp4?v=2", "poster": "media/space-room.jpg", "note": "Planets, a space station and nebulae wrap around the walls of an immersive room." },
         { "title": "Laser and LED screen", "len": "1:21", "src": "media/laser-led.mp4", "poster": "media/laser-led.jpg", "note": "Laser beams fan out over a big LED screen showing logos in a large hall." },
+        { "title": "Interactive floor", "portrait": true, "len": "0:52", "src": "media/floor-lights.mp4", "poster": "media/floor-lights.jpg", "note": "Coloured light follows every step across the floor. This clip is filmed upright on a phone." },
+        { "title": "Sculpture projection", "portrait": true, "len": "0:46", "src": "media/head-projection.mp4", "poster": "media/head-projection.jpg", "note": "A sculpted head with glowing eyes, lit by projection in a dark room." },
         { "title": "Laser drawing show", "portrait": true, "len": "1:17", "src": "media/laser-drawing.mp4", "poster": "media/laser-drawing.jpg", "note": "Lasers draw a ring, constellations, numbers and a running figure on a dark stage." },
-        { "title": "Stage laser show", "len": "2:08", "src": "media/stage-laser.mp4", "poster": "media/stage-laser.jpg", "note": "A laser show with light bars and an LED screen in a big event hall. This clip has sound." }
+        { "title": "Fluid simulation floor", "portrait": true, "len": "0:30", "src": "media/fluid-floor.mp4?v=2", "poster": "media/fluid-floor.jpg", "note": "Flowing, ink-like colour swirls follow every step across the floor. This clip is filmed upright on a phone." },
+        { "title": "Projected exhibition wall", "len": "2:45", "src": "media/exhibition-wall.mp4", "poster": "media/exhibition-wall.jpg", "note": "Light and graphics projected across the walls of an exhibition stand, with screens set into the wall." },
+        { "title": "Stage laser show", "len": "2:08", "src": "media/stage-laser.mp4", "poster": "media/stage-laser.jpg", "note": "A laser show with light bars and an LED screen in a big event hall. This clip has sound." },
+        { "title": "Interactive wall map", "len": "0:59", "src": "media/wall-map.mp4", "poster": "media/wall-map.jpg", "note": "An illustrated wall map that responds to touch." },
+        { "title": "Glowing ring display", "portrait": true, "len": "0:20", "src": "media/green-ring.mp4", "poster": "media/green-ring.jpg", "note": "Glowing green, smoke-like visuals swirl inside a round display." },
+        { "title": "Interactive wall story", "len": "1:44", "src": "media/touch-story-wall.mp4", "poster": "media/touch-story-wall.jpg", "note": "A visitor touches a wide projected wall and cards of stories open and move." },
+        { "title": "Immersive wave room", "len": "0:38", "src": "media/wave-room.mp4", "poster": "media/wave-room.jpg", "note": "A walk-in room with waves across the wall and an interactive floor." },
+        { "title": "Curved touch wall", "len": "0:52", "src": "media/curved-wall.mp4", "poster": "media/curved-wall.jpg", "note": "Two people explore a long curved projected wall: touch to open photos, numbers and maps." }
       ]
     }
   }
@@ -861,7 +808,7 @@ main { position: relative; z-index: 2; overflow-x: clip; }
   groups.forEach((g) => io.observe(g));
   setTimeout(() => groups.forEach((g) => g.classList.add("in")), 3500); // never leave content hidden
 
-  /* ---------- Cursor glow + tile spotlight ---------- */
+  /* ---------- Cursor glow ---------- */
   const glow = $("#cursorGlow");
   if (finePointer && !reduceMotion) {
     let gx = -999, gy = -999, tx = -999, ty = -999;
@@ -869,36 +816,6 @@ main { position: relative; z-index: 2; overflow-x: clip; }
     document.addEventListener("pointerleave", () => { glow.style.opacity = 0; });
     const follow = () => { gx += (tx - gx) * 0.14; gy += (ty - gy) * 0.14; glow.style.transform = `translate(${gx}px, ${gy}px)`; requestAnimationFrame(follow); };
     follow();
-  }
-  $$(".tile").forEach((t) => t.addEventListener("pointermove", (e) => {
-    const r = t.getBoundingClientRect();
-    t.style.setProperty("--mx", `${e.clientX - r.left}px`); t.style.setProperty("--my", `${e.clientY - r.top}px`);
-  }));
-
-  /* ---------- Tile videos: play on hover, or while in view on touch screens ---------- */
-  // To give a tile a video, add data-video="media/name.mp4" to its <li class="tile">.
-  const videoTiles = [];
-  $$(".tile[data-video]").forEach((tile) => {
-    const v = document.createElement("video");
-    v.className = "tile-video"; v.muted = true; v.loop = true; v.playsInline = true; v.preload = "none";
-    v.setAttribute("muted", ""); v.setAttribute("playsinline", ""); v.setAttribute("aria-hidden", "true"); v.tabIndex = -1;
-    v.dataset.src = tile.dataset.video;
-    v.addEventListener("playing", () => v.classList.add("on"));
-    tile.prepend(v); tile._v = v; videoTiles.push(tile);
-  });
-  const playTile = (v) => {
-    if (!v.src) v.src = v.dataset.src;
-    if (reduceMotion) return; // people who ask for less motion keep the still picture
-    const p = v.play(); if (p) p.catch(() => {});
-  };
-  if (finePointer) {
-    videoTiles.forEach((tile) => {
-      tile.addEventListener("pointerenter", () => playTile(tile._v));
-      tile.addEventListener("pointerleave", () => tile._v.pause());
-    });
-  } else if (videoTiles.length) {
-    const vio = new IntersectionObserver((entries) => entries.forEach((e) => (e.isIntersecting ? playTile(e.target._v) : e.target._v.pause())), { threshold: 0.6 });
-    videoTiles.forEach((tile) => vio.observe(tile));
   }
 
   /* ---------- The trailer: a silent, fast, looping "billboard" under "Interactive development" ---------- */
