@@ -112,3 +112,7 @@ window.PROJECTS = [
   P("display-cases", "Interactive display cases", "Visitors walk up to lit display cases in a showroom and interact with them",
     ["interactive"], [], { portrait: true, video: "media/display-cases.mp4?v=2", dated: "2025-11-19" }),
 ];
+
+/* The order of the fast-forward glimpse on the main page (media/glimpse.mp4). Built by tools\make-trailer.ps1 -Set all -NoCaptions.
+   One glimpse per project, in this order; the line under the video names the project on screen. */
+window.GLIMPSE = ["lidar-loom", "td-hand-particles", "laser-video", "fluid-wall", "leap-fruit", "virtual-tour", "stage-laser", "leap-puzzle", "desert-room", "led-gesture", "quiz-kiosk", "fluid-floor", "curved-wall", "td-audio-wave", "wearable-shooter", "laser-led", "space-room", "floor-lights", "quiz-wall", "touch-story-wall", "laser-drawing", "wave-room", "memory-game", "map-wall", "gesture-ring", "exhibition-wall", "sports-booth", "tablet-wall", "head-projection", "prize-wheel", "wall-map", "cube-trigger", "led-circuit-wall", "display-cases", "green-ring", "video-wall-control"];
