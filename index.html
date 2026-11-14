@@ -62,7 +62,6 @@ p { text-wrap: pretty; }
 ::selection { background: var(--accent); color: var(--on-accent); }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-kbd { font: inherit; font-size: .75rem; padding: 2px 7px; border-radius: 6px; background: rgba(var(--fg-rgb), .1); box-shadow: inset 0 -1px 0 rgba(var(--fg-rgb), .18); color: var(--text-soft); }
 
 .skip { position: fixed; left: 16px; top: -80px; z-index: 100; padding: 12px 20px; border-radius: var(--r-pill); background: var(--accent); color: var(--on-accent); font-weight: 600; text-decoration: none; }
 .skip:focus { top: 16px; }
@@ -105,10 +104,6 @@ h3 { font-size: 1.25rem; line-height: 1.25; letter-spacing: -.02em; }
 .nav nav a[aria-current="true"] { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 8px; }
 .nav-right { display: flex; align-items: center; gap: 10px; }
 .nav-cta { padding: 10px 20px; font-size: .9375rem; }
-.pal-btn { display: inline-flex; align-items: center; gap: 10px; padding: 9px 12px 9px 16px; border: 0; border-radius: var(--r-pill); cursor: pointer; font: inherit; font-size: .9375rem; color: var(--text-soft);
-  background: rgba(var(--fg-rgb), .06); box-shadow: inset 0 0 0 1px var(--line); touch-action: manipulation; transition: background-color .2s, box-shadow .2s, color .2s; }
-.pal-m { display: none; }
-.pal-btn:hover { color: var(--text); background: rgba(var(--fg-rgb), .11); box-shadow: inset 0 0 0 1px rgba(var(--accent2-rgb), .6); }
 
 /* ============ HERO ============ */
 .hero { position: relative; min-height: 100svh; display: flex; align-items: center; padding: 128px var(--gutter) 170px; overflow: hidden; isolation: isolate; }
@@ -272,19 +267,6 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 .viewer-list img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; display: block; }
 .viewer-list .vl-title { font-weight: 600; font-size: .9375rem; line-height: 1.25; padding: 0 4px; }
 .viewer-list small { padding: 0 4px 2px; font-size: .8125rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-/* ============ COMMAND MENU ============ */
-.palette { width: min(640px, calc(100vw - 32px)); margin: 12vh auto auto; padding: 0; border: 0; border-radius: 20px; background: var(--surface-2); color: var(--text); overflow: hidden;
-  box-shadow: 0 0 0 1px var(--line-strong), 0 40px 100px -20px rgba(0, 0, 0, .8), 0 0 80px -20px rgba(var(--accent-rgb), .5); }
-.palette::backdrop { background: rgba(3, 4, 8, .72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-.pal-input { width: 100%; padding: 22px 24px; border: 0; outline: 0; background: transparent; color: var(--text); font: inherit; font-size: 1.125rem; box-shadow: 0 1px 0 var(--line); }
-.pal-input::placeholder { color: var(--muted); }
-.pal-input:focus-visible { box-shadow: 0 2px 0 var(--accent2); border-radius: 0; }
-.pal-list { max-height: min(46vh, 360px); overflow: auto; overscroll-behavior: contain; padding: 8px; }
-.pal-item { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; border-radius: 12px; cursor: pointer; }
-.pal-item small { color: var(--muted); font-size: .8125rem; }
-.pal-item[aria-selected="true"] { background: rgba(var(--accent-rgb), .18); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), .5); }
-.pal-empty { padding: 18px 16px; color: var(--muted); }
-.pal-foot { display: flex; flex-wrap: wrap; gap: 8px 20px; padding: 12px 20px; font-size: .8125rem; color: var(--muted); box-shadow: 0 -1px 0 var(--line); }
 
 /* ============ THEME SWITCHER + TOAST ============ */
 .themer { position: fixed; right: 16px; bottom: 16px; z-index: 60; }
@@ -325,9 +307,6 @@ main { position: relative; z-index: 2; overflow-x: clip; }
 /* ============ RESPONSIVE ============ */
 @media (max-width: 760px) {
   .nav nav { display: none; }
-  .pal-kbd { display: none; }
-  .pal-d { display: none; }
-  .pal-m { display: inline; }
   .hero { padding-top: 112px; padding-bottom: 150px; align-items: flex-start; }
   .hero-pic { width: 100%; opacity: .42; -webkit-mask-image: linear-gradient(0deg, transparent 0%, #000 55%); mask-image: linear-gradient(0deg, transparent 0%, #000 55%); object-position: 40% 50%; }
   .bars { padding-left: 30px; }
@@ -387,9 +366,6 @@ main { position: relative; z-index: 2; overflow-x: clip; }
       <a href="#experience">Experience</a>
     </nav>
     <div class="nav-right">
-      <button type="button" class="pal-btn" data-open-palette aria-haspopup="dialog">
-        <span class="pal-d">Search</span><span class="pal-m">Menu</span><kbd class="pal-kbd">Ctrl K</kbd>
-      </button>
       <a class="btn btn-glow nav-cta" href="#contact">Contact</a>
     </div>
   </header>
@@ -410,7 +386,6 @@ main { position: relative; z-index: 2; overflow-x: clip; }
         <p class="lead rv">I’m <span translate="no">Ashwin CK</span>, a Unity developer in the UAE. I build interactive games, LiDAR touch walls, projection mapping and laser shows.</p>
         <div class="hero-cta rv">
           <a class="btn btn-glow" href="#work">See what I build</a>
-          <button type="button" class="btn btn-ghost" data-open-palette>Open command menu <kbd class="pal-kbd">Ctrl K</kbd></button>
         </div>
       </div>
 
@@ -613,15 +588,6 @@ main { position: relative; z-index: 2; overflow-x: clip; }
     </p>
   </footer>
 
-  <!-- Command menu (Ctrl or Cmd + K) -->
-  <dialog class="palette" id="palette" aria-label="Command menu">
-    <div class="pal-box">
-      <input id="palInput" class="pal-input" type="text" placeholder="Type a command or search…" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="palList" aria-label="Search commands">
-      <ul id="palList" class="pal-list" role="listbox" aria-label="Commands"></ul>
-      <p class="pal-foot"><span><kbd>↑</kbd> <kbd>↓</kbd> to move</span><span><kbd>Enter</kbd> to run</span><span><kbd>Esc</kbd> to close</span></p>
-    </div>
-  </dialog>
-
   <!-- Which videos open from which option. Add a clip here and its option gets a "Watch" button automatically. -->
   <script type="application/json" id="videoData">
   {
@@ -702,14 +668,12 @@ main { position: relative; z-index: 2; overflow-x: clip; }
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const TAU = Math.PI * 2;
   const isPixel = () => root.dataset.style === "pixel";
-  const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
   const store = {
     get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } },
     set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} },
   };
 
   $("#year").textContent = new Date().getFullYear();
-  $$(".pal-kbd").forEach((k) => { k.textContent = isMac ? "⌘ K" : "Ctrl K"; });
 
   /* ---------- Theme colours, read by the canvases ---------- */
   const colors = { a: "255, 43, 214", b: "34, 211, 238", c: "139, 92, 246" };
@@ -886,7 +850,6 @@ main { position: relative; z-index: 2; overflow-x: clip; }
     el.classList.add("has-videos");
     el.addEventListener("click", () => openViewer(id)); // the whole card is clickable; the button is the keyboard route
   });
-  const videoActions = Object.entries(VIDEO_DATA).filter(([, d]) => d.clips && d.clips.length).map(([id, d]) => ({ label: `Watch videos: ${d.title}`, hint: "Videos", run: () => openViewer(id) }));
   /* ---------- Copy email ---------- */
   const copyEmail = async () => {
     const email = $("#copyEmail").dataset.email;
@@ -895,57 +858,13 @@ main { position: relative; z-index: 2; overflow-x: clip; }
   };
   $("#copyEmail").addEventListener("click", copyEmail);
 
-  /* ---------- Command menu (Ctrl or Cmd + K, or press /) ---------- */
-  const pal = $("#palette"), palInput = $("#palInput"), palList = $("#palList");
-  const go = (sel) => $(sel).scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
-  const playGame = (id) => { go(`#${id}`); setTimeout(() => $(`#${id === "game" ? "gameStart" : "pongStart"}`).focus({ preventScroll: true }), 650); };
-  const ACTIONS = [
-    { label: "Go to About", hint: "Section", run: () => go("#about") },
-    { label: "Go to Work", hint: "Section", run: () => go("#work") },
-    { label: "Go to Play", hint: "Section", run: () => go("#play") },
-    { label: "Go to Experience", hint: "Section", run: () => go("#experience") },
-    { label: "Go to Contact", hint: "Section", run: () => go("#contact") },
-    { label: "Play Touch wall challenge", hint: "Game", run: () => playGame("game") },
-    { label: "Play Pong rally", hint: "Game", run: () => playGame("pong") },
-    { label: "Copy email address", hint: "Action", run: copyEmail },
-    { label: "Send an email", hint: "Action", run: () => { window.location.href = "mailto:ckashwinack@gmail.com"; } },
-    { label: "Open GitHub profile", hint: "Link", run: () => window.open("https://github.com/ashwinack", "_blank", "noopener") },
-    { label: "Switch to the next color theme", hint: "Theme", run: cycleTheme },
-    { label: "Back to top", hint: "Section", run: () => go("#top") },
-    ...videoActions,
-  ];
-  let shown = ACTIONS, sel = 0;
-  const renderPal = () => {
-    const q = palInput.value.trim().toLowerCase();
-    shown = ACTIONS.filter((a) => `${a.label} ${a.hint}`.toLowerCase().includes(q));
-    sel = Math.max(0, Math.min(sel, shown.length - 1));
-    palList.innerHTML = shown.length
-      ? shown.map((a, i) => `<li id="pal-${i}" role="option" aria-selected="${i === sel}" class="pal-item" data-i="${i}"><span>${a.label}</span><small>${a.hint}</small></li>`).join("")
-      : `<li class="pal-empty" role="presentation">No matching commands</li>`;
-    palInput.setAttribute("aria-activedescendant", shown.length ? `pal-${sel}` : "");
-    const cur = $(`#pal-${sel}`); if (cur) cur.scrollIntoView({ block: "nearest" });
-  };
-  const openPal = () => { if (pal.open) return; palInput.value = ""; sel = 0; renderPal(); pal.showModal(); palInput.focus(); };
-  const closePal = () => { if (pal.open) pal.close(); };
-  const runSel = () => { const a = shown[sel]; if (!a) return; closePal(); setTimeout(a.run, 80); };
-  palInput.addEventListener("input", () => { sel = 0; renderPal(); });
-  palInput.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowDown" && shown.length) { e.preventDefault(); sel = (sel + 1) % shown.length; renderPal(); }
-    else if (e.key === "ArrowUp" && shown.length) { e.preventDefault(); sel = (sel - 1 + shown.length) % shown.length; renderPal(); }
-    else if (e.key === "Enter") { e.preventDefault(); runSel(); }
-  });
-  palList.addEventListener("click", (e) => { const li = e.target.closest(".pal-item"); if (!li) return; sel = +li.dataset.i; runSel(); });
-  pal.addEventListener("click", (e) => { if (e.target === pal) closePal(); }); // click on the backdrop
-  $$("[data-open-palette]").forEach((b) => b.addEventListener("click", openPal));
+  /* ---------- Keyboard: T cycles the colour theme, Esc closes the theme picker ---------- */
   const typing = (el) => /INPUT|TEXTAREA|SELECT/.test(el.tagName) || el.isContentEditable;
   document.addEventListener("keydown", (e) => {
-    if ((e.key === "k" || e.key === "K") && (e.ctrlKey || e.metaKey)) { e.preventDefault(); pal.open ? closePal() : openPal(); return; }
     if (e.key === "Escape") toggleThemer(false);
-    if (pal.open || e.ctrlKey || e.metaKey || e.altKey || typing(e.target)) return;
-    if (e.key === "/") { e.preventDefault(); openPal(); }
-    else if (e.key === "t" || e.key === "T") cycleTheme();
+    if (e.ctrlKey || e.metaKey || e.altKey || typing(e.target)) return;
+    if (e.key === "t" || e.key === "T") cycleTheme();
   });
-
   /* ---------- Hero: laser beams + a dot wall that reacts to touch ---------- */
   const hero = $("#top"), hc = $("#heroCanvas"), hctx = hc.getContext("2d");
   const GAP = 36;
