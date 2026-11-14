@@ -454,9 +454,9 @@ main { position: relative; z-index: 2; overflow-x: clip; }
       </div>
 
       <div class="dev-grid">
-        <!-- The trailer: media/showreel.mp4 = a short glimpse of every video (built by tools\make-trailer.ps1). Poster: media/showreel.jpg. -->
-        <figure class="reel neon-edge rv" id="reel" data-video="media/showreel.mp4?v=5" data-poster="media/showreel.jpg?v=5">
-          <img class="reel-pic" src="media/showreel.jpg?v=5" width="1280" height="720" alt="Trailer with a short glimpse of each project: LiDAR touch wall, hand tracking, Leap Motion games and more" loading="lazy" decoding="async">
+        <!-- The trailer: media/showreel.mp4 = a short glimpse of each of the 19 videos below (built by tools\make-trailer.ps1 -Set interactive). Poster: media/showreel.jpg. -->
+        <figure class="reel neon-edge rv" id="reel" data-video="media/showreel.mp4?v=6" data-poster="media/showreel.jpg?v=6" data-label="Trailer with a short glimpse of each interactive application, game and sensor project">
+          <img class="reel-pic" src="media/showreel.jpg?v=6" width="1280" height="720" alt="Trailer with a short glimpse of each interactive application, game and sensor project: a 3D virtual tour, Leap Motion games, hand tracking and more" loading="lazy" decoding="async">
         </figure>
         <div class="mix neon-edge rv" data-video-id="interactive">
           <div class="mix-head">
@@ -471,12 +471,18 @@ main { position: relative; z-index: 2; overflow-x: clip; }
         <h3 class="rv">Beyond the screen</h3>
         <p class="rv">Where Unity meets LiDAR sensors, projectors and lasers.</p>
       </div>
-      <div class="mix neon-edge rv" data-video-id="beyond">
-        <div class="mix-head">
-          <h3>LiDAR, projection mapping and laser shows</h3>
-          <p>LiDAR systems that turn walls and surfaces into touch displays. Interactive projection mapping and immersive installations for events and exhibitions. Laser effects and multimedia shows that sync laser, video and lighting.</p>
+      <div class="dev-grid">
+        <!-- The trailer: media/beyond-reel.mp4 = a short glimpse of each of the 17 videos below (built by tools\make-trailer.ps1 -Set beyond). Poster: media/beyond-reel.jpg. -->
+        <figure class="reel neon-edge rv" id="reelBeyond" data-video="media/beyond-reel.mp4?v=1" data-poster="media/beyond-reel.jpg?v=1" data-label="Trailer with a short glimpse of each LiDAR, projection mapping and laser project">
+          <img class="reel-pic" src="media/beyond-reel.jpg?v=1" width="1280" height="720" alt="Trailer with a short glimpse of each LiDAR, projection mapping and laser project: a touch wall, immersive rooms and laser shows" loading="lazy" decoding="async">
+        </figure>
+        <div class="mix neon-edge rv" data-video-id="beyond">
+          <div class="mix-head">
+            <h3>LiDAR, projection mapping and laser shows</h3>
+            <p>LiDAR systems that turn walls and surfaces into touch displays. Interactive projection mapping and immersive installations for events and exhibitions. Laser effects and multimedia shows that sync laser, video and lighting.</p>
+          </div>
+          <div data-watch-slot></div>
         </div>
-        <div data-watch-slot></div>
       </div>
     </section>
     <!-- PLAY -->
@@ -817,37 +823,37 @@ main { position: relative; z-index: 2; overflow-x: clip; }
     follow();
   }
 
-  /* ---------- The trailer: a silent, fast, looping "billboard" under "Interactive development" ---------- */
-  // No buttons: it starts by itself (muted, as browsers require), loops, and rests while off-screen, while a full video is open,
-  // or in a hidden tab. With "reduce motion" on, it does not autoplay and shows normal controls instead.
-  const reel = $("#reel");
+  /* ---------- The trailers: silent, fast, looping "billboards" (one under each section heading) ---------- */
+  // No buttons: each starts by itself (muted, as browsers require), loops, and rests while off-screen, while a full video is open,
+  // or in a hidden tab. With "reduce motion" on, they do not autoplay and show normal controls instead.
   const reelReduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let reelVideo = null, reelVisible = false;
+  const reels = [];
   const reelSync = () => {
-    if (!reelVideo || reelReduced) return;
-    const dlg = $("#viewer"), shouldPlay = reelVisible && !document.hidden && !(dlg && dlg.open);
-    if (shouldPlay) { const p = reelVideo.play(); if (p) p.catch(() => {}); } else reelVideo.pause();
+    if (reelReduced) return;
+    const dlg = $("#viewer"), open = !!(dlg && dlg.open);
+    reels.forEach((r) => {
+      if (r.visible && !document.hidden && !open) { const p = r.v.play(); if (p) p.catch(() => {}); } else r.v.pause();
+    });
   };
-  if (reel && reel.dataset.video) {
+  $$(".reel[data-video]").forEach((reel) => {
     const still = $(".reel-pic", reel), v = document.createElement("video");
     v.className = "reel-video"; v.playsInline = true; v.preload = "metadata";
     v.muted = true; v.defaultMuted = true; v.loop = true; v.disablePictureInPicture = true; v.disableRemotePlayback = true;
     v.setAttribute("playsinline", ""); v.setAttribute("muted", ""); v.tabIndex = -1;
-    v.setAttribute("aria-label", "Trailer with a short glimpse of each interactive project");
+    v.setAttribute("aria-label", reel.dataset.label || "Trailer with a short glimpse of each project");
     v.poster = reel.dataset.poster || (still && (still.currentSrc || still.src)) || "";
     v.src = reel.dataset.video;
     if (still) still.replaceWith(v); else reel.prepend(v);
-    const credit = $(".credit", reel); if (credit && reel.dataset.poster) credit.remove(); // the stand-in picture and its credit go together
-    reelVideo = v;
+    const r = { v, visible: false };
+    reels.push(r);
     if (reelReduced) v.controls = true;
-    else {
-      new IntersectionObserver(([e]) => { reelVisible = e.isIntersecting; reelSync(); }, { threshold: 0.25 }).observe(reel);
-      document.addEventListener("visibilitychange", reelSync);
-      // if a browser (e.g. phone in low-power mode) blocks autoplay, the first touch or key press starts it
-      ["pointerdown", "touchstart", "keydown"].forEach((ev) => addEventListener(ev, reelSync, { once: true, passive: true }));
-    }
+    else new IntersectionObserver(([e]) => { r.visible = e.isIntersecting; reelSync(); }, { threshold: 0.25 }).observe(reel);
+  });
+  if (reels.length && !reelReduced) {
+    document.addEventListener("visibilitychange", reelSync);
+    // if a browser (e.g. phone in low-power mode) blocks autoplay, the first touch or key press starts it
+    ["pointerdown", "touchstart", "keydown"].forEach((ev) => addEventListener(ev, reelSync, { once: true, passive: true }));
   }
-
   /* ---------- Video viewer: open any option and watch its videos ---------- */
   // The list of videos lives in <script id="videoData"> in index.html. Options with clips get a "Watch" button.
   const VIDEO_DATA = (() => { try { return JSON.parse($("#videoData").textContent); } catch (e) { return {}; } })();
