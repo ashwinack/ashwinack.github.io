@@ -196,6 +196,94 @@
     setTimeout(() => $$(".reveal").forEach((el) => el.classList.add("in")), 4000); // never leave content hidden
   }
 
+  /* ---------- Fluid background: a small stable-fluids simulation (Jos Stam), drawn faintly behind everything ---------- */
+  // Pointers and fingers stir it, and three slow hidden currents keep it drifting on its own. Off with "reduce motion".
+  const fluidCv = $("#fluid");
+  if (fluidCv && !reduceMotion) {
+    const fctx = fluidCv.getContext("2d", { willReadFrequently: true }); // a tiny canvas rewritten every frame is cheaper kept on the CPU side
+    const NX = finePointer ? 72 : 40, DT = 1.5; // a coarse grid is enough: the picture is smoothed when it is scaled up
+    let NY = 1, S = 0, u, v, u0, v0, d, d0, img, px32;
+    const IX = (i, j) => i + (NX + 2) * j;
+    const setup = () => {
+      NY = Math.max(24, Math.round((NX * innerHeight) / innerWidth)); S = (NX + 2) * (NY + 2);
+      u = new Float32Array(S); v = new Float32Array(S); u0 = new Float32Array(S); v0 = new Float32Array(S); d = new Float32Array(S); d0 = new Float32Array(S);
+      fluidCv.width = NX; fluidCv.height = NY; img = fctx.createImageData(NX, NY);
+    };
+    const bounds = (b, x) => {
+      for (let j = 1; j <= NY; j++) { x[IX(0, j)] = b === 1 ? -x[IX(1, j)] : x[IX(1, j)]; x[IX(NX + 1, j)] = b === 1 ? -x[IX(NX, j)] : x[IX(NX, j)]; }
+      for (let i = 1; i <= NX; i++) { x[IX(i, 0)] = b === 2 ? -x[IX(i, 1)] : x[IX(i, 1)]; x[IX(i, NY + 1)] = b === 2 ? -x[IX(i, NY)] : x[IX(i, NY)]; }
+    };
+    const advect = (b, dst, src, uu, vv) => { // carry a field along the velocity field
+      for (let j = 1; j <= NY; j++) for (let i = 1; i <= NX; i++) {
+        const k = IX(i, j);
+        const x = Math.min(NX + 0.5, Math.max(0.5, i - DT * uu[k])), y = Math.min(NY + 0.5, Math.max(0.5, j - DT * vv[k]));
+        const i0 = x | 0, j0 = y | 0, s1 = x - i0, t1 = y - j0;
+        dst[k] = (1 - s1) * ((1 - t1) * src[IX(i0, j0)] + t1 * src[IX(i0, j0 + 1)]) + s1 * ((1 - t1) * src[IX(i0 + 1, j0)] + t1 * src[IX(i0 + 1, j0 + 1)]);
+      }
+      bounds(b, dst);
+    };
+    const project = (uu, vv, p, div) => { // keep the flow swirling instead of piling up
+      for (let j = 1; j <= NY; j++) for (let i = 1; i <= NX; i++) { const k = IX(i, j); div[k] = -0.5 * (uu[k + 1] - uu[k - 1] + vv[k + NX + 2] - vv[k - NX - 2]); p[k] = 0; }
+      bounds(0, div); bounds(0, p);
+      for (let n = 0; n < 8; n++) { for (let j = 1; j <= NY; j++) for (let i = 1; i <= NX; i++) { const k = IX(i, j); p[k] = (div[k] + p[k - 1] + p[k + 1] + p[k - NX - 2] + p[k + NX + 2]) / 4; } bounds(0, p); }
+      for (let j = 1; j <= NY; j++) for (let i = 1; i <= NX; i++) { const k = IX(i, j); uu[k] -= 0.5 * (p[k + 1] - p[k - 1]); vv[k] -= 0.5 * (p[k + NX + 2] - p[k - NX - 2]); }
+      bounds(1, uu); bounds(2, vv);
+    };
+    const splat = (x, y, dx, dy, amount, r = 3.4) => { // push and tint the fluid at a screen position
+      const cx = (x / innerWidth) * NX + 1, cy = (y / innerHeight) * NY + 1;
+      for (let j = Math.max(1, Math.floor(cy - r)); j <= Math.min(NY, Math.ceil(cy + r)); j++)
+        for (let i = Math.max(1, Math.floor(cx - r)); i <= Math.min(NX, Math.ceil(cx + r)); i++) {
+          const dd = Math.hypot(i - cx, j - cy); if (dd >= r) continue;
+          const w = (1 - dd / r) * (1 - dd / r), k = IX(i, j);
+          u[k] += dx * w; v[k] += dy * w; d[k] = Math.min(1.4, d[k] + amount * w);
+        }
+    };
+    const last = new Map();
+    const stir = (id, x, y) => {
+      const p = last.get(id);
+      if (p) {
+        let dx = ((x - p.x) / innerWidth) * NX * 1.4, dy = ((y - p.y) / innerHeight) * NY * 1.4; const m = Math.hypot(dx, dy);
+        if (m > 3) { dx *= 3 / m; dy *= 3 / m; }
+        if (m > 0.02) splat(x, y, dx, dy, Math.min(0.5, 0.1 + m * 0.12));
+      }
+      last.set(id, { x, y });
+    };
+    setup();
+    addEventListener("resize", setup);
+    addEventListener("pointermove", (e) => { if (e.pointerType !== "touch") stir("m", e.clientX, e.clientY); }, { passive: true });
+    addEventListener("pointerdown", (e) => { if (e.pointerType !== "touch") splat(e.clientX, e.clientY, 0, 0, 0.7, 5); }, { passive: true });
+    document.addEventListener("pointerleave", () => last.delete("m"));
+    addEventListener("touchstart", (e) => { for (const t of e.changedTouches) { last.set("t" + t.identifier, { x: t.clientX, y: t.clientY }); splat(t.clientX, t.clientY, 0, 0, 0.7, 5); } }, { passive: true });
+    addEventListener("touchmove", (e) => { for (const t of e.changedTouches) stir("t" + t.identifier, t.clientX, t.clientY); }, { passive: true });
+    const lift = (e) => { for (const t of e.changedTouches) last.delete("t" + t.identifier); };
+    addEventListener("touchend", lift, { passive: true }); addEventListener("touchcancel", lift, { passive: true });
+
+    const draw = () => {
+      const px = img.data;
+      for (let j = 1; j <= NY; j++) for (let i = 1; i <= NX; i++) {
+        const k = IX(i, j), o = ((j - 1) * NX + (i - 1)) * 4, den = Math.min(1, Math.max(0, d[k]));
+        const warm = Math.min(1, Math.hypot(u[k], v[k]) * 0.55) * 0.85; // fast flow turns orange, slow flow stays warm white
+        px[o] = 236 + (224 - 236) * warm; px[o + 1] = 230 + (103 - 230) * warm; px[o + 2] = 218 + (47 - 218) * warm; px[o + 3] = den * 60;
+      }
+      fctx.putImageData(img, 0, 0);
+    };
+    let lastStep = 0;
+    const run = (now) => {
+      requestAnimationFrame(run);
+      if (now - lastStep < 33) return; // about 30 updates a second is plenty for slow fluid and halves the work (a step costs under 1 ms)
+      lastStep = now;
+      const t = now / 1000;
+      for (let n = 0; n < 3; n++) { // slow hidden currents so the background moves even when nobody touches the page
+        const ex = innerWidth * (0.5 + 0.4 * Math.cos(t * 0.11 + n * 2.1)), ey = innerHeight * (0.5 + 0.36 * Math.sin(t * 0.13 + n * 1.7)), a = t * 0.4 + n * 2;
+        splat(ex, ey, Math.cos(a) * 0.42, Math.sin(a) * 0.5, 0.14, 5.5);
+      }
+      u0.set(u); v0.set(v); advect(1, u, u0, u0, v0); advect(2, v, v0, u0, v0); project(u, v, u0, v0);
+      d0.set(d); advect(0, d, d0, u, v);
+      for (let k = 0; k < S; k++) { d[k] *= 0.989; u[k] *= 0.996; v[k] *= 0.996; }
+      draw();
+    };
+    requestAnimationFrame(run);
+  }
   /* ---------- Blob drawing, in the look of a video blob-tracking overlay ---------- */
   // Thin white boxes with a small value in the middle, and hairlines running through the boxes and out to the edges.
   const lineThrough = (ctx, a, b, W, H) => {
