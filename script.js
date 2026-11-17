@@ -167,7 +167,7 @@
   const gNow = $("#glimpseNow"), gVideo = $("#reel");
   if (gNow && gVideo && window.GLIMPSE) {
     const order = window.GLIMPSE.map((id) => PROJECTS.find((q) => q.id === id)).filter(Boolean), n = order.length;
-    const STEP = 1.9; // seconds each project is on screen: 2.2 s minus the 0.3 s dissolve
+    const STEP = 1.3; // seconds each project is on screen: 1.6 s minus the 0.3 s dissolve
     const ticks = $("#glimpseTicks"); if (ticks) ticks.innerHTML = order.map(() => "<i></i>").join("");
     const tickEls = ticks ? $$("i", ticks) : [];
     let shown = -1;
