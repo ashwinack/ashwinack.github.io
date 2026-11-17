@@ -205,7 +205,7 @@
     let NY = 1, S = 0, u, v, u0, v0, d, d0, img, px32;
     const IX = (i, j) => i + (NX + 2) * j;
     const setup = () => {
-      NY = Math.max(24, Math.round((NX * innerHeight) / innerWidth)); S = (NX + 2) * (NY + 2);
+      NY = Math.max(24, Math.round((NX * (innerHeight || 1)) / (innerWidth || 1)) || 24); S = (NX + 2) * (NY + 2);
       u = new Float32Array(S); v = new Float32Array(S); u0 = new Float32Array(S); v0 = new Float32Array(S); d = new Float32Array(S); d0 = new Float32Array(S);
       fluidCv.width = NX; fluidCv.height = NY; img = fctx.createImageData(NX, NY);
     };
@@ -284,34 +284,11 @@
     };
     requestAnimationFrame(run);
   }
-  /* ---------- Blob drawing, in the look of a video blob-tracking overlay ---------- */
-  // Thin white boxes with a small value in the middle, and hairlines running through the boxes and out to the edges.
-  const lineThrough = (ctx, a, b, W, H) => {
-    const dx = b.x - a.x, dy = b.y - a.y; if (!dx && !dy) return;
-    let t0 = -1e9, t1 = 1e9;
-    for (const [p, d, lim] of [[a.x, dx, W], [a.y, dy, H]]) {
-      if (d) { const u = (0 - p) / d, w = (lim - p) / d; t0 = Math.max(t0, Math.min(u, w)); t1 = Math.min(t1, Math.max(u, w)); }
-      else if (p < 0 || p > lim) return;
-    }
-    ctx.moveTo(a.x + dx * t0, a.y + dy * t0); ctx.lineTo(a.x + dx * t1, a.y + dy * t1);
-  };
-  const drawBlobs = (ctx, blobs, W, H, minBox, fontPx, fan = 2) => {
-    const list = [...blobs].sort((p, q) => p.x - q.x);
-    ctx.lineWidth = 1; ctx.strokeStyle = "rgba(255, 255, 255, 0.72)"; ctx.beginPath();
-    for (let i = 0; i < list.length; i++) for (let k = 1; k <= fan; k++) if (list[i + k]) lineThrough(ctx, list[i], list[i + k], W, H);
-    ctx.stroke();
-    ctx.font = `${fontPx}px 'JetBrains Mono', monospace`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    for (const b of blobs) {
-      const w = Math.round(Math.max(minBox, b.x1 - b.x0)), h = Math.round(Math.max(minBox, b.y1 - b.y0));
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.95)"; ctx.strokeRect(Math.round(b.x - w / 2) + 0.5, Math.round(b.y - h / 2) + 0.5, w, h);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.95)"; ctx.fillText(b.val.toFixed(4), b.x, b.y);
-    }
-  };
   /* ---------- Page-wide field: a dot grid plus TouchDesigner-style blob tracking ---------- */
   // Every pointer (mouse or finger) leaves heat in a coarse grid. Cells above a threshold form blobs; each blob is found by
   // flood fill and tracked from frame to frame, then drawn with a bracket, centroid cross, id, size and speed, like a Blob Track TOP.
   // Mouse and touch both work (each finger is its own blob). With "reduce motion" the field stays a still dot grid.
-  const field = $("#field"), readout = $("#readout");
+  const field = $("#field");
   if (field) {
     const ctx = field.getContext("2d"), coarse = !finePointer;
     const GAP = 30, CELL = coarse ? 14 : 12, REACH = 190, THRESH = 0.42, R = coarse ? 4 : 3.2;
@@ -341,35 +318,6 @@
       inp.x = x; inp.y = y;
     };
 
-    const find = () => { // threshold, flood fill into blobs, then keep ids stable by matching to the previous frame
-      stamp++; const found = [];
-      for (let s = 0; s < heat.length; s++) {
-        if (heat[s] < THRESH || seen[s] === stamp) continue;
-        const stack = [s]; seen[s] = stamp;
-        let n = 0, i0 = cols, i1 = 0, j0 = rows, j1 = 0, sw = 0, sx = 0, sy = 0;
-        while (stack.length) {
-          const k = stack.pop(), i = k % cols, j = (k / cols) | 0, w = heat[k];
-          n++; sw += w; sx += (i + 0.5) * w; sy += (j + 0.5) * w;
-          if (i < i0) i0 = i; if (i > i1) i1 = i; if (j < j0) j0 = j; if (j > j1) j1 = j;
-          if (i > 0 && heat[k - 1] >= THRESH && seen[k - 1] !== stamp) { seen[k - 1] = stamp; stack.push(k - 1); }
-          if (i < cols - 1 && heat[k + 1] >= THRESH && seen[k + 1] !== stamp) { seen[k + 1] = stamp; stack.push(k + 1); }
-          if (j > 0 && heat[k - cols] >= THRESH && seen[k - cols] !== stamp) { seen[k - cols] = stamp; stack.push(k - cols); }
-          if (j < rows - 1 && heat[k + cols] >= THRESH && seen[k + cols] !== stamp) { seen[k + cols] = stamp; stack.push(k + cols); }
-        }
-        if (n >= 3) found.push({ x: (sx / sw) * CELL, y: (sy / sw) * CELL, x0: i0 * CELL, y0: j0 * CELL, x1: (i1 + 1) * CELL, y1: (j1 + 1) * CELL, area: n });
-      }
-      const prev = blobs;
-      blobs = found.map((b) => {
-        let best = -1, bd = 140;
-        prev.forEach((p, i) => { if (!p.used) { const d = Math.hypot(p.x - b.x, p.y - b.y); if (d < bd) { bd = d; best = i; } } });
-        if (best >= 0) { const p = prev[best]; p.used = true; b.id = p.id; b.v = p.v * 0.8 + bd * 60 * 0.2; }
-        else { b.id = nextId++; b.v = 0; }
-        b.val = 1 + b.area / 40;
-        return b;
-      });
-    };
-
-    const pad2 = (n) => String(n).padStart(2, "0");
     const draw = () => {
       ctx.clearRect(0, 0, W, H);
       const near = [...inputs.values()];
@@ -390,7 +338,6 @@
           ctx.beginPath(); ctx.moveTo(tr[t - 1][0], tr[t - 1][1]); ctx.lineTo(tr[t][0], tr[t][1]); ctx.stroke();
         }
       }
-      drawBlobs(ctx, blobs, W, H, 44, 10);
     };
     const frame = () => {
       for (const inp of inputs.values()) { deposit(inp.x, inp.y, 0.12, R); inp.idle = inp.moved ? 0 : (inp.idle || 0) + 1; if (inp.idle > 8 && inp.trail.length > 1) inp.trail.shift(); inp.moved = false; } // a held pointer keeps its blob alive; its trail fades once it rests
@@ -398,8 +345,7 @@
       for (let k = 0; k < heat.length; k++) { const v = heat[k]; if (v > 0.004) { heat[k] = v * 0.972; alive = true; } else heat[k] = 0; }
       if (alive || live > 0) {
         live = alive ? 30 : live - 1;
-        find(); draw();
-        if (readout && ++tick % 5 === 0) readout.textContent = blobs.length ? `blobs ${blobs.length}   id ${pad2(blobs[0].id % 100)}   x ${(blobs[0].x / W).toFixed(3)}   y ${(blobs[0].y / H).toFixed(3)}` : "blobs 0   waiting for input";
+        draw();
       }
       requestAnimationFrame(frame);
     };
